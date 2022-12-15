@@ -1,26 +1,33 @@
 ;; -*- no-byte-compile: t; -*-
-;;; ~/.config/doom/packages.el
+;;; ~/.doom.d/packages.el
 
-(package! synosaurus)
+;;; :tools lookup 
+(package! synosaurus) ;; https://github.com/doomemacs/doomemacs/issues/6076
 
-(package! aggressive-indent)
-(package! button-lock)
-;;(package! cider :pin "11156e7b0cab470f4aab39d3af5ee3cb1e0b09d0 " :recipe (:host github :repo "clojure-emacs/cider" :files ("*.el" (:exclude ".dir-locals.el") "cider-pkg.el")))
-(package! evil-cleverparens)
+;;; :tools magit
 (package! magit-delta)
+
+;;; :ui
+(package! button-lock)
+
+;;; :lang clojure, emacs-lisp
+(package! aggressive-indent)
+(package! evil-cleverparens)
 (package! neil :recipe (:host github :repo "babashka/neil" :files ("*.el")))
 (package! zprint-mode)
 
-(package! protobuf-mode)
+;;; :lang yaml
+(package! k8s-mode :recipe
+  (:host github
+   :repo "loganlinn/emacs-k8s-mode"))
 
+;; FIXME needed? if so, document why...
 (unpin! lsp-treemacs)
 (unpin! lsp-ui)
 (unpin! treemacs)
 (unpin! hover)
-
 ;; (package! flymake-shellcheck)
-
 ;; (package! just-mode)
 ;; (package! justl)
 
-;;; ~/.config/doom/packages.el ends here
+;;; ~/.doom.d/packages.el ends here
