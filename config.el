@@ -59,7 +59,11 @@ Return the first (topmost) matched directory or nil if not found."
 ;; Focus new window after splitting
 (after! evil
   (setq evil-split-window-below t
-        evil-vsplit-window-right t))
+        evil-vsplit-window-right t)
+  ;; thicc finger support
+  (evil-ex-define-cmd "W" #'evil-write)
+  (evil-ex-define-cmd "E" #'evil-edit)
+  (evil-ex-define-cmd "Sort" #'evil-edit))
 
 (map!
  ;; vim
@@ -109,6 +113,15 @@ Return the first (topmost) matched directory or nil if not found."
     (setq evil-cp-additional-bindings (assoc-delete-all "M-]" evil-cp-additional-bindings)))
   ;; 4. bind all the keys listed in evil-cp-additional-bindings
   (evil-cp-set-additional-bindings))
+
+
+;;; :editor format
+(add-hook 'go-mode-hook #'format-all-mode)
+(add-hook 'nix-mode-hook #'format-all-mode)
+(add-hook 'python-mode-hook #'format-all-mode)
+(add-hook 'rust-mode-hook #'format-all-mode)
+(add-hook 'sh-mode-hook #'format-all-mode)
+
 
 ;;; :editor snippets
 (use-package! k8s-mode
@@ -211,8 +224,14 @@ Return the first (topmost) matched directory or nil if not found."
 (setq org-directory "~/org/")
 (after! org-mode (require 'ol-man)) ;; enable manpage links (man:)
 
+;;; :lang mermaid
+; (use-package! mermaid-mode)
+
 ;;; :lang nix
 (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
+
+;;; :lang yuck
+(use-package! yuck-mode)
 
 ;;; :lang sh
 ;; (use-package! flymake-shellcheck

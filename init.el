@@ -15,6 +15,7 @@
 ;;      directory (for easy access to its source code).
 
 (doom! :input
+       ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
        ;;japanese
        ;;layout            ; auie,ctsrnm is the superior home row
@@ -44,7 +45,7 @@
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
        tabs              ; a tab bar for Emacs
        (treemacs +lsp)          ; a project drawer, like neotree but cooler
-       ;;unicode           ; extended unicode support for various languages
+       unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        ;; window-select     ; visually switch windows
@@ -152,7 +153,7 @@
        lua               ; one-based indices? one-based indices
        (markdown +grip)    ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       (nix +tree-sitter)  ; I hereby declare "nix geht mehr!"
+       (nix +lsp +tree-sitter)  ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org +roam2 +brain +hugo +dragndrop +present +pretty +pomodoro) ; organize your plain life in plain text
        ;;php               ; perl's insecure younger brother

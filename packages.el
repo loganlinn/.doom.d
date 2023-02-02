@@ -16,10 +16,19 @@
 (package! neil :recipe (:host github :repo "babashka/neil" :files ("*.el")))
 (package! zprint-mode)
 
+;;; :lang mermaid
+; (package! mermaid-mode)
+
 ;;; :lang yaml
 (package! k8s-mode :recipe
   (:host github
    :repo "loganlinn/emacs-k8s-mode"))
+
+;;; :lang yuck
+(package! yuck-mode)
+
+;;; :term
+; (package! term-keys :recipe (:host github :repo "CyberShadow/term-keys" :files ("*.el")))
 
 ;; FIXME needed? if so, document why...
 (unpin! lsp-treemacs)
