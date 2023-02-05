@@ -5,7 +5,7 @@
 (package! synosaurus) ;; https://github.com/doomemacs/doomemacs/issues/6076
 
 ;;; :tools magit
-(package! magit-delta)
+; (package! magit-delta)
 
 ;;; :ui
 (package! button-lock)
