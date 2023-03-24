@@ -225,3 +225,5 @@ Return the first (topmost) matched directory or nil if not found."
 (load! "+magit")
 (load! "+clojure")
 ;;(load! "+crystal")
+
+(load! (concat "systems/" (system-name)) (dir!) t)
