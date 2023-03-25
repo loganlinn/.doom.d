@@ -1,9 +1,9 @@
 ;;; :lang clojure
-(after! clojure-mode
+(use-package! clojure-mode
+  :hook (clojure-mode . rainbow-delimiters-mode)
+  :hook (clojure-mode . aggressive-indent-mode)
+  :config
   (setq clojure-toplevel-inside-comment-form t)
-
-  (add-hook! 'clojure-mode-hook
-             #'aggressive-indent-mode)
 
   (define-clojure-indent
     (defstruct 1)
@@ -28,7 +28,9 @@
     ;; next.jdbc
     (on-connection 1)))
 
-(after! cider
+(use-package! cider
+  :after clojure-mode
+  :config
   (setq cider-prompt-for-symbol nil
         cider-save-file-on-load t
         cider-print-fn 'puget
@@ -37,21 +39,15 @@
         ;;cider-repl-buffer-size-limit 200
         cider-enrich-classpath t)
 
-  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.35.0")
-  (cider-add-to-alist 'cider-jack-in-dependencies "io.github.nextjournal/clerk" "0.12.707")
+  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.36.0")
+  (cider-add-to-alist 'cider-jack-in-dependencies "io.github.nextjournal/clerk" "0.13.842")
+  (cider-add-to-alist 'cider-jack-in-dependencies "philoskim/debux" "0.8.2")
+  (cider-add-to-alist 'cider-jack-in-dependencies "com.clojure-goes-fast/clj-java-decompiler" "0.3.3")
 
-  (map! (:map clojure-mode-map
-         :desc "Reload system" "C-<f5>" #'+cider-eval-dev-reload)
-        ;(:map cider-repl-mode-map
-        ; :n "C-j" 'cider-repl-next-input
-        ; :n "C-k" 'cider-repl-previous-input)
-        (:map clojure-mode-map
-         "C-c M-k" #'+cider-jack-in-clj-polylith
-         "C-c M-o" #'portal.api/open
-         "C-c M-l" #'portal.api/clear)
-        ;; Shell-like keybind for populating input with previous command
-        (:map cider-repl-mode-map
-         "C-p" #'cider-repl-backward-input))
+  (defun +cider-eval-dev-reload ()
+    (interactive)
+    (cider-ensure-connected)
+    (cider-interactive-eval "(require 'dev) (dev/go)"))
 
   (defun +cider-jack-in-clj-polylith (params)
     "Start an nREPL server for the current Polylith workspace and connect to it."
@@ -63,23 +59,14 @@
             (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
         (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
 
-  (defun +cider-eval-dev-reload  ()
-    "Evaluate a fixed expression used frequently in development to start/reload system."
-    (interactive)
-    (cider-ensure-connected)
-    (cider-interactive-eval "(require 'dev) (dev/go)"))
-
   ;; def portal to the dev namespace to allow dereferencing via @dev/portal
   (defun portal.api/open ()
     (interactive)
     (cider-interactive-eval
-     (concat
-      "(do"
-      "(ns dev)"
-      "(def portal ((requiring-resolve 'portal.api/open)))"
-      "(add-tap (requiring-resolve 'portal.api/submit))"
-      "(. (Runtime/getRuntime) (addShutdownHook (Thread. #((requiring-resolve 'portal.api/close)))))"
-      ")")))
+     "(in-ns 'user)
+      (def portal ((requiring-resolve 'portal.api/open)))
+      (add-tap (requiring-resolve 'portal.api/submit))
+      (.addShutdownHook (Runtime/getRuntime) (Thread. #((requiring-resolve 'portal.api/close))))"))
 
   (defun portal.api/clear ()
     (interactive)
@@ -103,9 +90,20 @@
           (buffer-file-name)))
       (save-buffer)
       (cider-interactive-eval
-       (concat "(nextjournal.clerk/show! \"" filename "\")")))))
+       (concat "(nextjournal.clerk/show! \"" filename "\")"))))
 
-(after! clj-refactor
+  (map! :map clojure-mode-map
+        :desc "Reload system" "C-<f5>" #'+cider-eval-dev-reload
+        :desc "Polylith REPL" "C-c M-k" #'+cider-jack-in-clj-polylith
+        :desc "Open Portal"  "C-c M-o" #'portal.api/open
+        :desc "Clear Portal" "C-c M-l" #'portal.api/clear)
+
+  (map! :map cider-repl-mode-map
+        "C-p" #'cider-repl-backward-input))
+
+(use-package! clj-refactor
+  :after clojure-mode
+  :config
   (map! :map clojure-refactor-map
         :desc "Add missing libspec" "n a" #'cljr-add-missing-libspec
         :desc "Clean ns" "n c" #'lsp-clojure-clean-ns)
@@ -145,6 +143,7 @@
     :init
     (setq evil-cleverparens-use-regular-insert nil
           evil-cleverparens-swap-move-by-word-and-symbol t
+          evil-cleverparens-move-skip-delimiters nil
           evil-want-fine-undo t
           evil-move-beyond-eol t)
     :config

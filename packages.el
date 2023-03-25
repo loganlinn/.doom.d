@@ -1,6 +1,11 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; ~/.doom.d/packages.el
 
+;; (package! benchmark-init)
+
+;;; :editor evil
+;; (package! evil-string-inflection) ;; evil operator to cycle *-case in text objects
+
 ;;; :tools lookup 
 (package! synosaurus) ;; https://github.com/doomemacs/doomemacs/issues/6076
 
@@ -13,16 +18,17 @@
 ;;; :lang clojure, emacs-lisp
 (package! aggressive-indent)
 (package! evil-cleverparens)
-(package! neil :recipe (:host github :repo "babashka/neil" :files ("*.el")))
+;;(package! evil-smartparens)
 (package! zprint-mode)
 
 ;;; :lang mermaid
-; (package! mermaid-mode)
+(package! mermaid-mode)
+(package! ob-mermaid)
 
 ;;; :lang yaml
-(package! k8s-mode :recipe
-  (:host github
-   :repo "loganlinn/emacs-k8s-mode"))
+;; (package! k8s-mode :recipe
+;;   (:host github
+;;    :repo "loganlinn/emacs-k8s-mode"))
 
 ;;; :lang yuck
 (package! yuck-mode)
@@ -47,5 +53,8 @@
 (package! with-editor
           :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
           :recipe (:host github :repo "magit/with-editor"))
+
+;;; :lang v
+(package! v-mode)
 
 ;;; ~/.doom.d/packages.el ends here

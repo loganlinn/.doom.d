@@ -9,7 +9,7 @@
 (setq doom-theme 'doom-one
       ;;doom-font (font-spec :family "Fira Code" :size 14 :weight 'light)
       doom-font (font-spec :family "DejaVu Sans Mono" :size 14)
-      ;;doom-variable-pitch-font (font-spec :family "Fira Sans")
+      doom-variable-pitch-font (font-spec :family "FiraSans")
       ;;doom-unicode-font (font-spec :family "DejaVu Sans Mono")
       ;;doom-big-font (font-spec :family "Fira Mono" :size 19)
       )
@@ -18,6 +18,13 @@
  (setq display-line-numbers-type 'relative
        fill-column 99)
 
+;;; completion vertico
+(setq-hook! vertico-posframe-mode
+  vertico-posframe-poshandler #'posframe-poshandler-frame-top-center
+  vertico-posframe-truncate-lines t
+  vertico-posframe-width 150
+  vertico-posframe-min-height 1
+  vertico-posframe-border-width 1)
 ;;; :core packages
 ;; projectile
 (after! projectile
@@ -81,7 +88,7 @@ Return the first (topmost) matched directory or nil if not found."
   :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
 
  ;; Intellij rename
- (:when (featurep! :tools lsp)
+ (:when (modulep! :tools lsp)
   (:after lsp
    :desc "Rename" [S-f6] #'lsp-rename)))
 
@@ -207,7 +214,6 @@ Return the first (topmost) matched directory or nil if not found."
   (dolist (sym ligatures-to-disable)
     (plist-put! +ligatures-extra-symbols sym nil)))
 
-
 ;;; :tools lookup
 (add-to-list '+lookup-provider-url-alist '("grep.app" "https://grep.app/search?q=%s"))
 (setq +lookup-provider-url-alist (assoc-delete-all "Google images" +lookup-provider-url-alist))
@@ -225,10 +231,15 @@ Return the first (topmost) matched directory or nil if not found."
 (after! org-mode (require 'ol-man)) ;; enable manpage links (man:)
 
 ;;; :lang mermaid
-; (use-package! mermaid-mode)
+(use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
+(use-package! ob-mermaid)
 
 ;;; :lang nix
 (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
+
+(setq-hook! 'nix-mode
+  +format-with 'alejandra
+  +format-with-lsp nil)
 
 ;;; :lang yuck
 (use-package! yuck-mode)
@@ -239,6 +250,16 @@ Return the first (topmost) matched directory or nil if not found."
 ;;   :commands flymake-shellcheck-load
 ;;   :init
 ;;   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
+
+
+;;; :lang v
+;; (use-package! v-mode
+;;   :defer t
+;;   :config
+;;   (map! :localleader
+;;         :map v-mode-map
+;;         "m" #'v-menu
+;;         "f" #'v-format-buffer))
 
 (load! "+ui")
 (load! "+magit")

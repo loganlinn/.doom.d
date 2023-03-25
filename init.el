@@ -13,7 +13,6 @@
 ;;
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
-
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
@@ -83,7 +82,8 @@
        syntax              ; tasing you for every semicolon you forget
        (spell              ; tasing you for misspelling mispelling
         +flyspell
-        +aspell)
+        ;; +aspell
+        +hunspell)
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -194,3 +194,7 @@
        :config
        ;;literate
        (default +bindings +smartparens))
+
+;; (when init-file-debug
+;;   (require 'benchmark-init)
+;;   (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
