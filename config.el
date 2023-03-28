@@ -253,13 +253,13 @@ Return the first (topmost) matched directory or nil if not found."
 
 
 ;;; :lang v
-;; (use-package! v-mode
-;;   :defer t
-;;   :config
-;;   (map! :localleader
-;;         :map v-mode-map
-;;         "m" #'v-menu
-;;         "f" #'v-format-buffer))
+(use-package! v-mode
+  :defer t
+  :config
+  (map! :localleader
+        :map v-mode-map
+        "m" #'v-menu
+        "f" #'v-format-buffer))
 
 (load! "+ui")
 (load! "+magit")
