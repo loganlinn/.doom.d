@@ -43,6 +43,7 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "io.github.nextjournal/clerk" "0.13.842")
   (cider-add-to-alist 'cider-jack-in-dependencies "philoskim/debux" "0.8.2")
   (cider-add-to-alist 'cider-jack-in-dependencies "com.clojure-goes-fast/clj-java-decompiler" "0.3.3")
+  (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
 
   (defun +cider-eval-dev-reload ()
     (interactive)
