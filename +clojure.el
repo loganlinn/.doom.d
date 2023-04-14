@@ -44,6 +44,7 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "philoskim/debux" "0.8.2")
   (cider-add-to-alist 'cider-jack-in-dependencies "com.clojure-goes-fast/clj-java-decompiler" "0.3.3")
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
+  (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
   (defun +cider-eval-dev-reload ()
     (interactive)
@@ -93,6 +94,22 @@
       (cider-interactive-eval
        (concat "(nextjournal.clerk/show! \"" filename "\")"))))
 
+  (defun +cider-sort-last-sexp-and-replace ()
+    "Evaluate the expression preceding point and replace it with its result."
+    (interactive)
+    (let* ((last-sexp (cider-last-sexp))
+           (sort-sexp (concat "(sort (quote " last-sexp "))")))
+      ;; we have to be sure the evaluation won't result in an error
+      (cider-nrepl-sync-request:eval sort-sexp)
+      ;; seems like the sexp is valid, so we can safely kill it
+      (let ((opoint (point)))
+        (clojure-backward-logical-sexp)
+        (kill-region (point) opoint))
+      (cider-interactive-eval sort-sexp
+                              (cider-insert-eval-handler (cider-current-repl))
+                              nil
+                              (cider--nrepl-print-request-map fill-column))))
+
   (map! :map clojure-mode-map
         :desc "Reload system" "C-<f5>" #'+cider-eval-dev-reload
         :desc "Polylith REPL" "C-c M-k" #'+cider-jack-in-clj-polylith
@@ -110,6 +127,11 @@
         :desc "Clean ns" "n c" #'lsp-clojure-clean-ns)
 
   (setq cljr-add-ns-to-blank-clj-files t
+        cljr-insert-newline-after-require t
+        cljr-print-miser-width 40
+        cljr-print-right-margin 80
+        ;; cljr-project-clean-functions '(lsp-clojure-clean-ns)
+        cljr-slash-uses-suggest-libspec t
         cljr-hotload-dependencies nil
         cljr-magic-require-namespaces
         '(;; Clojure
@@ -160,5 +182,13 @@
 
     (add-hook! 'cider-repl-mode-hook
       (evil-cleverparens-mode t)
-      (smartparens-strict-mode t))
-    )
+      (smartparens-strict-mode t)))
+
+(use-package! sesman
+  :after cider
+  :config
+  (defun link-cider-session ()
+    "Link the current buffer to a running CIDER session."
+    (interactive)
+    (setq sesman-system 'CIDER)
+    (sesman-link-with-buffer)))

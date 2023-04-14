@@ -70,7 +70,14 @@ Return the first (topmost) matched directory or nil if not found."
   ;; thicc finger support
   (evil-ex-define-cmd "W" #'evil-write)
   (evil-ex-define-cmd "E" #'evil-edit)
-  (evil-ex-define-cmd "Sort" #'evil-edit))
+  (evil-ex-define-cmd "Sort" #'evil-edit)
+
+  (defun +evil-reset ()
+    "Attempt to recover from weird edge cases I've found myself in"
+    (interactive)
+    (evil-mode 0)
+    (evil-mode 1)
+    (funcall evil-default-cursor)))
 
 (map!
  ;; vim
