@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: class-predicate
+# key: cls?
+# condition: (require 's)
+# --
+
+(defn ${1:name}?
+  "Returns x when x is ${2:Object}, otherwise logical false."
+  ^$2
+  [x]
+  (when (instance? $2 x) x))
