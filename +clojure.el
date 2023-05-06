@@ -1,32 +1,12 @@
 ;;; :lang clojure
 (use-package! clojure-mode
-  :hook (clojure-mode . rainbow-delimiters-mode)
-  :hook (clojure-mode . aggressive-indent-mode)
   :config
   (setq clojure-toplevel-inside-comment-form t)
 
-  (define-clojure-indent
-    (defstruct 1)
-    (match 1)
-    ;; plumbing
-    (fnk :defn)
-    (defnk :defn)
-    (letk 1)
-    (for-map 1)
-    ;; potemkin
-    (definterface+    '(2 nil nil (1)))
-    (defprotocol+     '(1 (:defn)))
-    (defrecord+       '(2 nil nil (1)))
-    (deftype+         '(2 nil nil (1)))
-    (extend-protocol+ '(1 :defn))
-    (reify+           '(:defn (1)))
-    (proxy+           '(:defn (1)))
-    (reify-map-type   '(:defn (1)))
-    (def-map-type     '(2 nil nil (1)))
-    (def-derived-map  '(2 nil nil (1)))
-    (try* 0)
-    ;; next.jdbc
-    (on-connection 1)))
+  (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+        (:localleader
+         (:when (modulep! :tools lsp)
+           :desc "Clean ns" "o" #'lsp-clojure-clean-ns))))
 
 (use-package! cider
   :after clojure-mode
@@ -46,11 +26,6 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
-  (defun +cider-eval-dev-reload ()
-    (interactive)
-    (cider-ensure-connected)
-    (cider-interactive-eval "(require 'dev) (dev/go)"))
-
   (defun +cider-jack-in-clj-polylith (params)
     "Start an nREPL server for the current Polylith workspace and connect to it."
     (interactive "P")
@@ -61,24 +36,59 @@
             (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
         (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
 
-  ;; def portal to the dev namespace to allow dereferencing via @dev/portal
-  (defun portal.api/open ()
-    (interactive)
-    (cider-interactive-eval
-     "(in-ns 'user)
-      (def portal ((requiring-resolve 'portal.api/open)))
-      (add-tap (requiring-resolve 'portal.api/submit))
-      (.addShutdownHook (Runtime/getRuntime) (Thread. #((requiring-resolve 'portal.api/close))))"))
 
-  (defun portal.api/clear ()
+  (defun portal/open ()
     (interactive)
     (cider-interactive-eval
-     "((requiring-resolve 'portal.api/clear))"))
+     "(do
+        (in-ns 'user)
+        (require 'portal.api)
+        (defonce portal nil)
+        (defonce portal-shutdown-hook-added
+          (do (.addShutdownHook (Runtime/getRuntime) (Thread. portal.api/close)) true))
+        (alter-var-root #'user/portal portal.api/open)
+        (add-tap #'portal.api/submit)
+        (portal.api/url portal))"))
 
-  (defun portal.api/close ()
+  (defun portal/clear ()
     (interactive)
     (cider-interactive-eval
-     "((requiring-resolve 'portal.api/close))"))
+     "(if-let [var (requiring-resolve 'user/portal)]
+        (do ((requiring-resolve 'portal.api/clear) @var)
+            \"Cleared\")
+        \"No session found.\")"))
+
+  (defun portal/close ()
+    (interactive)
+    (cider-interactive-eval
+     "(when-let [var (requiring-resolve 'user/portal)]
+        (when (some? @var)
+          (alter-var-root var (requiring-resolve 'portal.api/close))
+          (remove-tap (requiring-resolve 'portal.api/submit))
+          \"Closed\"))"))
+
+  (defun portal/docs ()
+    (interactive)
+    (cider-interactive-eval
+     "((requiring-resolve 'portal.api/docs))"))
+
+  (require 'easymenu)
+  (easy-menu-define portal-menu clojure-mode-map
+    "Menu for Portal (Clojure data navigator)"
+    '("Portal"
+      ["Open" portal/open]
+      ["Clear" portal/clear]
+      ["Close" portal/close]
+      "-"
+      ["Docs" portal/docs]))
+
+  (map! (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+         :desc "Portal: Open"  [f8]     #'portal/open
+         :desc "Portal: Clear" [C-f8]   #'portal/clear
+         :desc "Portal: Close" [S-f8]   #'portal/close
+         :desc "Portal: Docs"  [C-S-f8] #'portal/docs))
+
+  ;;;
 
   (defun clerk/serve ()
     (interactive)
@@ -87,44 +97,28 @@
 
   (defun clerk/show ()
     (interactive)
-    (when-let
-        ((filename
-          (buffer-file-name)))
+    (when-let ((filename (buffer-file-name)))
       (save-buffer)
       (cider-interactive-eval
-       (concat "(nextjournal.clerk/show! \"" filename "\")"))))
+       (concat "((requiring-resolve 'nextjournal.clerk/show!) \"" filename "\")"))))
 
-  (defun +cider-sort-last-sexp-and-replace ()
-    "Evaluate the expression preceding point and replace it with its result."
-    (interactive)
-    (let* ((last-sexp (cider-last-sexp))
-           (sort-sexp (concat "(sort (quote " last-sexp "))")))
-      ;; we have to be sure the evaluation won't result in an error
-      (cider-nrepl-sync-request:eval sort-sexp)
-      ;; seems like the sexp is valid, so we can safely kill it
-      (let ((opoint (point)))
-        (clojure-backward-logical-sexp)
-        (kill-region (point) opoint))
-      (cider-interactive-eval sort-sexp
-                              (cider-insert-eval-handler (cider-current-repl))
-                              nil
-                              (cider--nrepl-print-request-map fill-column))))
-
-  (map! :map clojure-mode-map
-        :desc "Reload system" "C-<f5>" #'+cider-eval-dev-reload
-        :desc "Polylith REPL" "C-c M-k" #'+cider-jack-in-clj-polylith
-        :desc "Open Portal"  "C-c M-o" #'portal.api/open
-        :desc "Clear Portal" "C-c M-l" #'portal.api/clear)
+  (map! :map cider-mode-map
+        "C-c M-k" #'+cider-jack-in-clj-polylith)
 
   (map! :map cider-repl-mode-map
-        "C-p" #'cider-repl-backward-input))
+        :ni "C-p" #'cider-repl-backward-input))
 
 (use-package! clj-refactor
   :after clojure-mode
   :config
-  (map! :map clojure-refactor-map
-        :desc "Add missing libspec" "n a" #'cljr-add-missing-libspec
-        :desc "Clean ns" "n c" #'lsp-clojure-clean-ns)
+  (map! (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+         :ni [M-return] #'cljr-add-missing-libspec)
+        (:map clojure-refactor-map
+         :desc "Clean ns" "o"  #'lsp-clojure-clean-ns
+         :desc "Clean ns" "C-o"  #'lsp-clojure-clean-ns
+         ;; older
+         :desc "Add missing libspec" "n a" #'cljr-add-missing-libspec
+         :desc "Clean ns" "n c" #'lsp-clojure-clean-ns))
 
   (setq cljr-add-ns-to-blank-clj-files t
         cljr-insert-newline-after-require t

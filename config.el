@@ -154,6 +154,13 @@ Return the first (topmost) matched directory or nil if not found."
         :desc "Refresh" [f5] #'treemacs-refresh))
 
 
+;;; :ui flycheck
+
+(use-package! flycheck
+  :config
+  (setq flycheck-navigation-minimum-level 'error))
+
+
 ;;; :tools gist
 (after! gist
   (setq gist-view-gist t))
