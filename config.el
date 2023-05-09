@@ -160,7 +160,6 @@ Return the first (topmost) matched directory or nil if not found."
   :config
   (setq flycheck-navigation-minimum-level 'error))
 
-
 ;;; :tools gist
 (after! gist
   (setq gist-view-gist t))
@@ -194,6 +193,7 @@ Return the first (topmost) matched directory or nil if not found."
   :config
   (setq lsp-ui-doc-enable nil
         lsp-ui-peek-enable nil))
+
 (setq-hook! 'lisp-ui
   lsp-enable-indentation t
   lsp-enable-on-type-formatting t
@@ -245,8 +245,8 @@ Return the first (topmost) matched directory or nil if not found."
 (after! org-mode (require 'ol-man)) ;; enable manpage links (man:)
 
 ;;; :lang mermaid
-(use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
-(use-package! ob-mermaid)
+;; (use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
+;; (use-package! ob-mermaid)
 
 ;;; :lang nix
 (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
@@ -267,17 +267,17 @@ Return the first (topmost) matched directory or nil if not found."
 
 
 ;;; :lang v
-(use-package! v-mode
-  :defer t
-  :config
-  (map! :localleader
-        :map v-mode-map
-        "m" #'v-menu
-        "f" #'v-format-buffer))
+;; (use-package! v-mode
+;;   :defer t
+;;   :config
+;;   (map! :localleader
+;;         :map v-mode-map
+;;         "m" #'v-menu
+;;         "f" #'v-format-buffer))
 
 (load! "+ui")
 (load! "+magit")
 (load! "+clojure")
-;;(load! "+crystal")
+(load! "+crystal")
 
 (load! (concat "systems/" (system-name)) (dir!) t)
