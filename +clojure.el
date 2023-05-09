@@ -1,6 +1,8 @@
 ;;; :lang clojure
 (use-package! clojure-mode
   :config
+  (rainbow-delimiters-mode +1)
+  (aggressive-indent-mode +1)
   (setq clojure-toplevel-inside-comment-form t)
 
   (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
@@ -17,16 +19,17 @@
         cider-repl-history-size 1000
         cider-known-endpoints nil
         ;;cider-repl-buffer-size-limit 200
-        cider-enrich-classpath t)
+        cider-enrich-classpath t
+        )
 
-  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.36.0")
+  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.40.0")
   (cider-add-to-alist 'cider-jack-in-dependencies "io.github.nextjournal/clerk" "0.13.842")
   (cider-add-to-alist 'cider-jack-in-dependencies "philoskim/debux" "0.8.2")
   (cider-add-to-alist 'cider-jack-in-dependencies "com.clojure-goes-fast/clj-java-decompiler" "0.3.3")
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
-  (defun +cider-jack-in-clj-polylith (params)
+  (defun polylith/jack-in (params)
     "Start an nREPL server for the current Polylith workspace and connect to it."
     (interactive "P")
     (let ((ws-dir (locate-dominating-file (pwd) "workspace.edn")))
@@ -36,36 +39,57 @@
             (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
         (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
 
+  (add-to-list 'cider-connection-init-commands #'polylith/jack-in)
 
   (defun portal/open ()
     (interactive)
     (cider-interactive-eval
      "(do
-        (in-ns 'user)
-        (require 'portal.api)
-        (defonce portal nil)
-        (defonce portal-shutdown-hook-added
-          (do (.addShutdownHook (Runtime/getRuntime) (Thread. portal.api/close)) true))
-        (alter-var-root #'user/portal portal.api/open)
-        (add-tap #'portal.api/submit)
-        (portal.api/url portal))"))
+(in-ns 'user)
+
+(require '[portal.api :as portal]
+         '[clojure.datafy :refer [datafy]])
+
+(defonce portal nil)
+
+(defn portal-submit [x]
+  (portal.api/submit
+   (cond-> x
+     (instance? Exception x)
+     (-> clojure.datafy/datafy
+         (assoc :runtime :jvm)))))
+
+;; needs graceful degredation
+#_(defn portal-inspect [x]
+  (portal/inspect x))
+
+(defn portal-open! []
+  (defonce portal-shutdown-hook-added
+    (.addShutdownHook (Runtime/getRuntime) (Thread. #'portal/close)))
+  (alter-var-root #'portal portal/open #_{:launcher :emacs})
+  (add-tap #'portal-submit)
+  portal)
+
+(defn portal-close! []
+  (when portal
+    (alter-var-root #'portal portal/close)
+    (remove-tap #'portal-submit)))
+
+(defn portal-clear! []
+  (when portal
+    (portal/clear portal)))
+
+(portal-open!))"))
 
   (defun portal/clear ()
     (interactive)
     (cider-interactive-eval
-     "(if-let [var (requiring-resolve 'user/portal)]
-        (do ((requiring-resolve 'portal.api/clear) @var)
-            \"Cleared\")
-        \"No session found.\")"))
+     "((or (requiring-resolve 'user/portal-clear!) (constantly nil)))"))
 
   (defun portal/close ()
     (interactive)
     (cider-interactive-eval
-     "(when-let [var (requiring-resolve 'user/portal)]
-        (when (some? @var)
-          (alter-var-root var (requiring-resolve 'portal.api/close))
-          (remove-tap (requiring-resolve 'portal.api/submit))
-          \"Closed\"))"))
+     "((or (requiring-resolve 'user/portal-close!) (constantly nil)))"))
 
   (defun portal/docs ()
     (interactive)
@@ -73,6 +97,7 @@
      "((requiring-resolve 'portal.api/docs))"))
 
   (require 'easymenu)
+
   (easy-menu-define portal-menu clojure-mode-map
     "Menu for Portal (Clojure data navigator)"
     '("Portal"
@@ -86,7 +111,10 @@
          :desc "Portal: Open"  [f8]     #'portal/open
          :desc "Portal: Clear" [C-f8]   #'portal/clear
          :desc "Portal: Close" [S-f8]   #'portal/close
-         :desc "Portal: Docs"  [C-S-f8] #'portal/docs))
+         :desc "Portal: Docs"  [C-S-f8] #'portal/docs
+         :desc "Portal: Docs"  [C-S-f8] #'portal/docs
+         ;; PROTIP: don't bind [C-M-f*], it's Linux shortcut to switch TTY.
+         ))
 
   ;;;
 
@@ -103,7 +131,7 @@
        (concat "((requiring-resolve 'nextjournal.clerk/show!) \"" filename "\")"))))
 
   (map! :map cider-mode-map
-        "C-c M-k" #'+cider-jack-in-clj-polylith)
+        "C-c M-k" #'polylith/jack-in)
 
   (map! :map cider-repl-mode-map
         :ni "C-p" #'cider-repl-backward-input))
