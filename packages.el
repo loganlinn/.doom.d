@@ -6,9 +6,6 @@
 ;;; :editor evil
 ;; (package! evil-string-inflection) ;; evil operator to cycle *-case in text objects
 
-;;; :tools lookup 
-(package! synosaurus) ;; https://github.com/doomemacs/doomemacs/issues/6076
-
 ;;; :tools magit
 ; (package! magit-delta)
 

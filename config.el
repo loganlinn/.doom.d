@@ -3,10 +3,8 @@
 (setq user-full-name "Logan Linn"
       user-mail-address "logan@llinn.dev")
 
-(setq delete-by-moving-to-trash t
-      trash-directory (concat (or (getenv "XDG_DATA_HOME") "~/.local/share") "/Trash/files"))
-
 (setq doom-theme 'doom-one
+      doom-themes-treemacs-theme "doom-colors"
       ;;doom-font (font-spec :family "Fira Code" :size 14 :weight 'light)
       doom-font (font-spec :family "DejaVu Sans Mono" :size 14)
       doom-variable-pitch-font (font-spec :family "FiraSans")
@@ -14,21 +12,41 @@
       ;;doom-big-font (font-spec :family "Fira Mono" :size 19)
       )
 
-;;; :core editor
- (setq display-line-numbers-type 'relative
-       fill-column 99)
+(setq fancy-splash-image (concat doom-private-dir "splash.png"))
 
-;;; completion vertico
-(setq-hook! vertico-posframe-mode
-  vertico-posframe-poshandler #'posframe-poshandler-frame-top-center
-  vertico-posframe-truncate-lines t
-  vertico-posframe-width 150
-  vertico-posframe-min-height 1
-  vertico-posframe-border-width 1)
-;;; :core packages
-;; projectile
+;; Hide the menu for as minimalistic a startup screen as possible.
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+
+(setq delete-by-moving-to-trash t)
+
+(setq-hook! display-line-numbers-mode display-line-numbers-type 'relative)
+
+(setq fill-column 99)
+
+;; Disable some of ligatures enabled by (ligatures +extra)
+(when (modulep! :ui ligatures +extra)
+ (let ((ligatures-to-disable '(:true :false :int :float :str :bool :list :and :or :for)))
+   (dolist (sym ligatures-to-disable)
+     (plist-put! +ligatures-extra-symbols sym nil))))
+
+(when (modulep! :tools lookup)
+  (add-to-list '+lookup-provider-url-alist '("grep.app" "https://grep.app/search?q=%s"))
+  (setq +lookup-provider-url-alist (assoc-delete-all "Google images" +lookup-provider-url-alist))
+  (setq +lookup-provider-url-alist (assoc-delete-all "Google maps" +lookup-provider-url-alist))
+  (setq +lookup-provider-url-alist (assoc-delete-all "DuckDuckGo" +lookup-provider-url-alist)))
+
+(when (modulep! :completion vertico +childframe)
+ (after! vertico-posframe
+   vertico-posframe-poshandler #'posframe-poshandler-frame-top-center
+   vertico-posframe-truncate-lines t
+   vertico-posframe-width 150
+   vertico-posframe-min-height 1
+   vertico-posframe-border-width 1))
+
+(after! which-key
+  (setq which-key-idle-delay 0.4))
+
 (after! projectile
-
   (setq projectile-create-missing-test-files t
         projectile-project-search-path '(("~/src" . 3))
         projectile-enable-caching nil
@@ -49,76 +67,44 @@ Return the first (topmost) matched directory or nil if not found."
   (projectile-update-project-type 'clojure-cli
                                   :src-dir "src"
                                   :test-dir "test")
-  ;; vim-projectionist (a.vim) style commands for impl<>test files
-  (evil-ex-define-cmd "A"  'projectile-toggle-between-implementation-and-test)
-  (evil-ex-define-cmd "AV" '(lambda ()
-                              (interactive)
-                              (evil-window-vsplit)
-                              (windmove-right)
-                              (projectile-toggle-between-implementation-and-test)))
-  (evil-ex-define-cmd "AS" '(lambda ()
-                              (interactive)
-                              (evil-window-split)
-                              (windmove-down)
-                              (projectile-toggle-between-implementation-and-test))))
 
-;;; :editor evil
-;; Focus new window after splitting
+  ;; vim-projectionist (a.vim) style commands for impl<>test files
+  ;; (evil-ex-define-cmd "A"  'projectile-toggle-between-implementation-and-test)
+  ;; (evil-ex-define-cmd "AV" '(lambda ()
+  ;;                             (interactive)
+  ;;                             (evil-window-vsplit)
+  ;;                             (windmove-right)
+  ;;                             (projectile-toggle-between-implementation-and-test)))
+  ;; (evil-ex-define-cmd "AS" '(lambda ()
+  ;;                             (interactive)
+  ;;                             (evil-window-split)
+  ;;                             (windmove-down)
+  ;;                             (projectile-toggle-between-implementation-and-test)))
+  (map! :leader
+        :prefix-map ("p" . "project")
+        :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test))
+
 (after! evil
+  ;; Focus new window after splitting
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
+
   ;; thicc finger support
   (evil-ex-define-cmd "W" #'evil-write)
   (evil-ex-define-cmd "E" #'evil-edit)
   (evil-ex-define-cmd "Sort" #'evil-edit)
 
-  (defun +evil-reset ()
-    "Attempt to recover from weird edge cases I've found myself in"
-    (interactive)
-    (evil-mode 0)
-    (evil-mode 1)
-    (funcall evil-default-cursor)))
+  (map!
+   :nv "C-a" #'evil-numbers/inc-at-pt
+   :nv "C-S-a" #'evil-numbers/dec-at-pt))
 
-(map!
- ;; vim
- :nv "C-a"   #'evil-numbers/inc-at-pt
- :nv "C-S-a" #'evil-numbers/dec-at-pt
-
- ;; vim-projectionist (a.vim)
- (:leader
-  :prefix-map ("p" . "project")
-  :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test)
-
- ;; Intellij error nav
- (:after flycheck
-  :desc "Jump to next error" [f2]   #'flycheck-next-error
-  :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
-
- ;; Intellij rename
- (:when (modulep! :tools lsp)
-  (:after lsp
-   :desc "Rename" [S-f6] #'lsp-rename)))
-
-(map! :nvi
-
-      :desc "Expand region"
-      "M-=" #'er/expand-region
-
-      :desc "Reverse expand region"
-      "M--" (lambda () (interactive) (er/expand-region -1)))
-
-(map! :leader
-
-      :desc "Open dotfiles"
-      "f T" #'open-dotfiles
-
-      :desc "Find file in dotfiles"
-      "f t" #'find-in-dotfiles)
-
-;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
-;; 1. disable additional bindings so they aren't bound when the package loads
-(setq evil-cleverparens-use-additional-bindings nil)
-(after! evil-cleverparens
+(use-package! evil-cleverparens
+  :hook (clojure-mode . evil-cleverparens-mode)
+  :init
+  ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
+  ;; 1. disable additional bindings so they aren't bound when the package loads
+  (setq evil-cleverparens-use-additional-bindings nil)
+  :config
   ;; 2. turn on the "additional-bindings" so that when we call `evil-cp-set-additional-bindings` it will bind keys
   (setq evil-cleverparens-use-additional-bindings t)
   (unless window-system
@@ -128,48 +114,46 @@ Return the first (topmost) matched directory or nil if not found."
   ;; 4. bind all the keys listed in evil-cp-additional-bindings
   (evil-cp-set-additional-bindings))
 
+(after! expand-region
+  (map! :nvi
+        :desc "Expand region"
+        "M-=" #'er/expand-region
+        :desc "Reverse expand region"
+        "M--" (lambda () (interactive) (er/expand-region -1))))
 
-;;; :editor format
-(add-hook 'go-mode-hook #'format-all-mode)
-(add-hook 'nix-mode-hook #'format-all-mode)
-(add-hook 'python-mode-hook #'format-all-mode)
-(add-hook 'rust-mode-hook #'format-all-mode)
-(add-hook 'sh-mode-hook #'format-all-mode)
+(add-hook! (go-mode python-mode rust-mode sh-mode) #'format-all-mode)
+;; (add-hook 'nix-mode-hook #'format-all-mode)
+;; (add-hook 'python-mode-hook #'format-all-mode)
+;; (add-hook 'rust-mode-hook #'format-all-mode)
+;; (add-hook 'sh-mode-hook #'format-all-mode)
 
+(setq +treemacs-git-mode 'deferred)
 
-;;; :editor snippets
-(use-package! k8s-mode
-  :hook (k8s-mode . yas-minor-mode))
-
-;;; :ui treemacs
-(use-package! treemacs
-  :defer t
-  :init
-  (setq +treemacs-git-mode 'deferred) ;; hack: should be in :config, but placed here to utilize logic in doom-emacs/modules/ui/treemacs (https://github.com/hlissner/doom-emacs/blob/aed2972d7400834210759727117c50de34826db9/modules/ui/treemacs/config.el#L32)
-  :config
+(after! treemacs
   (treemacs-project-follow-mode +1)
   (map! :map treemacs-mode-map
         :desc "Expand" [mouse-1] #'treemacs-single-click-expand-action
         :desc "Rename file" [f2] #'treemacs-rename-file
         :desc "Refresh" [f5] #'treemacs-refresh))
 
+(after! flycheck
+  (setq flycheck-navigation-minimum-level 'error)
+  ;; error navigation a la IntelliJ
+  (map!
+   :desc "Jump to next error" [f2]   #'flycheck-next-error
+   :desc "Jump to prev error" [S-f2] #'flycheck-previous-error))
 
-;;; :ui flycheck
-
-(use-package! flycheck
-  :config
-  (setq flycheck-navigation-minimum-level 'error))
-
-;;; :tools gist
 (after! gist
   (setq gist-view-gist t))
 
-
-;;; :tools lsp
-(after! lsp-mode
+(after! lsp
   (setq lsp-log-io nil
         lsp-file-watch-threshold 8264
-        lsp-headerline-breadcrumb-enable nil)
+        lsp-headerline-breadcrumb-enable nil
+        lsp-enable-indentation t
+        lsp-enable-on-type-formatting t
+        lsp-lens-enable t)
+
   (dolist (dir '("[/\\\\]\\.ccls-cache\\'"
                  "[/\\\\]\\.mypy_cache\\'"
                  "[/\\\\]\\.pytest_cache\\'"
@@ -185,78 +169,59 @@ Return the first (topmost) matched directory or nil if not found."
                  "[/\\\\]third-party\\'"
                  "[/\\\\]buildtools\\'"
                  "[/\\\\]out\\'"))
-    (push dir lsp-file-watch-ignored-directories)))
+    (push dir lsp-file-watch-ignored-directories))
 
-(use-package! lsp-ui
-  :after lsp-mode
-  :commands lsp-ui-mode
-  :config
+  (map! :desc "Rename" [S-f6] #'lsp-rename))
+
+(after! lsp-ui
   (setq lsp-ui-doc-enable nil
-        lsp-ui-peek-enable nil))
+        lsp-ui-peek-enable nil
+        lsp-ui-doc-border (doom-color 'fg)
+        lsp-ui-doc-enable t
+        lsp-ui-doc-include-signature t
+        lsp-ui-doc-include-signature t
+        lsp-ui-doc-max-height 30
+        lsp-ui-doc-max-width 100
+        lsp-ui-sideline-enable nil
+        lsp-ui-sideline-ignore-duplicate t))
 
-(setq-hook! 'lisp-ui
-  lsp-enable-indentation t
-  lsp-enable-on-type-formatting t
-  lsp-ui-doc-border (doom-color 'fg)
-  lsp-ui-doc-enable t
-  lsp-ui-doc-include-signature t
-  lsp-ui-doc-include-signature t
-  lsp-ui-doc-max-height 30
-  lsp-ui-doc-max-width 100
-  lsp-ui-sideline-enable nil
-  lsp-ui-sideline-ignore-duplicate t
-  lsp-lens-enable t)
-
-(use-package! lsp-treemacs
-  :config
+(after! lsp-treemacs
   (setq lsp-treemacs-error-list-current-project-only t))
 
+(use-package! button-lock
+  :defer t
+  :config
+  (button-lock-set-button
+   "PAT-[0-9]+"
+   (lambda ()
+     (interactive)
+     (browse-url (concat "https://linear.app/patch-tech/issue/"
+                         (buffer-substring
+                          (previous-single-property-change (point) 'mouse-face)
+                          (next-single-property-change (point) 'mouse-face)))))
+   :face             'link
+   :face-policy      'prepend
+   :keyboard-binding "RET"))
 
-;;; :ui doom-theme
-(setq doom-themes-treemacs-theme "doom-colors")
+;;; :lang
 
+(after! org
+  (setq org-directory "~/org/")
+  (add-to-list 'org-modules 'ol-man))
 
-;;; :ui doom-dashboard
-(setq fancy-splash-image (concat doom-private-dir "splash.png"))
-;; Hide the menu for as minimalistic a startup screen as possible.
-(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-
-
-;;; :ui ligatures
-;; Disable some of ligatures enabled by (ligatures +extra)
-(let ((ligatures-to-disable '(:true :false :int :float :str :bool :list :and :or :for)))
-  (dolist (sym ligatures-to-disable)
-    (plist-put! +ligatures-extra-symbols sym nil)))
-
-;;; :tools lookup
-(add-to-list '+lookup-provider-url-alist '("grep.app" "https://grep.app/search?q=%s"))
-(setq +lookup-provider-url-alist (assoc-delete-all "Google images" +lookup-provider-url-alist))
-(setq +lookup-provider-url-alist (assoc-delete-all "Google maps" +lookup-provider-url-alist))
-(setq +lookup-provider-url-alist (assoc-delete-all "DuckDuckGo" +lookup-provider-url-alist))
-
-
-;;; :package which-key
-(after! which-key
-  (setq which-key-idle-delay 0.4))
-
-
-;;; :lang org
-(setq org-directory "~/org/")
-(after! org-mode (require 'ol-man)) ;; enable manpage links (man:)
+(after! nix
+  (set-formatter! 'alejandra "alejandra --quiet"
+    :modes '(nix-mode))
+  (setq +format-with 'alejandra
+        +format-with-lsp nil))
 
 ;;; :lang mermaid
 ;; (use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
 ;; (use-package! ob-mermaid)
 
-;;; :lang nix
-(set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
-
-(setq-hook! 'nix-mode
-  +format-with 'alejandra
-  +format-with-lsp nil)
-
 ;;; :lang yuck
-(use-package! yuck-mode)
+(use-package! yuck-mode
+  :defer t)
 
 ;;; :lang sh
 ;; (use-package! flymake-shellcheck
@@ -264,7 +229,6 @@ Return the first (topmost) matched directory or nil if not found."
 ;;   :commands flymake-shellcheck-load
 ;;   :init
 ;;   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
-
 
 ;;; :lang v
 ;; (use-package! v-mode
@@ -275,9 +239,9 @@ Return the first (topmost) matched directory or nil if not found."
 ;;         "m" #'v-menu
 ;;         "f" #'v-format-buffer))
 
-(load! "+ui")
 (load! "+magit")
 (load! "+clojure")
 (load! "+crystal")
 
-(load! (concat "systems/" (system-name)) (dir!) t)
+;; Load per-system config
+(load! (concat "+systems/" (system-name)) (dir!) t)

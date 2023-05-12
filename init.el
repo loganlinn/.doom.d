@@ -13,6 +13,9 @@
 ;;
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
+
+(setq byte-compile-warnings '(not obsolete))
+
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
@@ -31,7 +34,7 @@
        doom              ; what makes DOOM look the way it does
        doom-dashboard    ; a nifty splash screen for Emacs
        ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
-       (emoji +unicode)  ; 🙂
+       (emoji +unicode +github)  ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
        indent-guides     ; highlighted indent columns
@@ -96,7 +99,7 @@
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        gist              ; interacting with github gists
-       lookup              ; navigate your code and its documentation
+       (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
        lsp               ; M-x vscode
        (magit +forge)    ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
@@ -199,5 +202,3 @@
 ;; (when init-file-debug
 ;;   (require 'benchmark-init)
 ;;   (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
-
-(setq byte-compile-warnings '(not obsolete))

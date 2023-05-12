@@ -1,26 +1,22 @@
-;;; :lang clojure
-(use-package! clojure-mode
-  :config
+
+(add-hook! clojure-mode
+  (setq clojure-toplevel-inside-comment-form t)
+
   (rainbow-delimiters-mode +1)
   (aggressive-indent-mode +1)
-  (setq clojure-toplevel-inside-comment-form t)
 
   (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
         (:localleader
          (:when (modulep! :tools lsp)
            :desc "Clean ns" "o" #'lsp-clojure-clean-ns))))
 
-(use-package! cider
-  :after clojure-mode
-  :config
+(add-hook! cider-mode
   (setq cider-prompt-for-symbol nil
         cider-save-file-on-load t
         cider-print-fn 'puget
         cider-repl-history-size 1000
         cider-known-endpoints nil
-        ;;cider-repl-buffer-size-limit 200
-        cider-enrich-classpath t
-        )
+        cider-enrich-classpath t)
 
   (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.40.0")
   (cider-add-to-alist 'cider-jack-in-dependencies "io.github.nextjournal/clerk" "0.13.842")
@@ -29,19 +25,7 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
-  (defun polylith/jack-in (params)
-    "Start an nREPL server for the current Polylith workspace and connect to it."
-    (interactive "P")
-    (let ((ws-dir (locate-dominating-file (pwd) "workspace.edn")))
-      (if ws-dir
-          (progn
-            (message "Starting nREPL server from `%s'" ws-dir)
-            (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
-        (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
-
-  (add-to-list 'cider-connection-init-commands #'polylith/jack-in)
-
-  (defun portal/open ()
+  (defun +clojure/portal-open ()
     (interactive)
     (cider-interactive-eval
      "(do
@@ -81,17 +65,17 @@
 
 (portal-open!))"))
 
-  (defun portal/clear ()
+  (defun +clojure/portal-clear ()
     (interactive)
     (cider-interactive-eval
      "((or (requiring-resolve 'user/portal-clear!) (constantly nil)))"))
 
-  (defun portal/close ()
+  (defun +clojure/portal-close ()
     (interactive)
     (cider-interactive-eval
      "((or (requiring-resolve 'user/portal-close!) (constantly nil)))"))
 
-  (defun portal/docs ()
+  (defun +clojure/portal-docs ()
     (interactive)
     (cider-interactive-eval
      "((requiring-resolve 'portal.api/docs))"))
@@ -101,40 +85,54 @@
   (easy-menu-define portal-menu clojure-mode-map
     "Menu for Portal (Clojure data navigator)"
     '("Portal"
-      ["Open" portal/open]
-      ["Clear" portal/clear]
-      ["Close" portal/close]
+      ["Open" +clojure/portal-open]
+      ["Clear" +clojure/portal-clear]
+      ["Close" +clojure/portal-close]
       "-"
-      ["Docs" portal/docs]))
+      ["Docs" +clojure/portal-docs]))
 
   (map! (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
-         :desc "Portal: Open"  [f8]     #'portal/open
-         :desc "Portal: Clear" [C-f8]   #'portal/clear
-         :desc "Portal: Close" [S-f8]   #'portal/close
-         :desc "Portal: Docs"  [C-S-f8] #'portal/docs
-         :desc "Portal: Docs"  [C-S-f8] #'portal/docs
+         :desc "Portal: Open"  [f8]     #'+clojure/portal-open
+         :desc "Portal: Clear" [C-f8]   #'+clojure/portal-clear
+         :desc "Portal: Close" [S-f8]   #'+clojure/portal-close
+         :desc "Portal: Docs"  [C-S-f8] #'+clojure/portal-docs
+         :desc "Portal: Docs"  [C-S-f8] #'+clojure/portal-docs
          ;; PROTIP: don't bind [C-M-f*], it's Linux shortcut to switch TTY.
          ))
 
   ;;;
 
-  (defun clerk/serve ()
+  (defun +clojure/clerk-serve ()
     (interactive)
     (cider-interactive-eval
      "((requiring-resolve 'nextjournal.clerk/serve!) {:browse? true})"))
 
-  (defun clerk/show ()
+  (defun +clojure/clerk-show ()
     (interactive)
     (when-let ((filename (buffer-file-name)))
       (save-buffer)
       (cider-interactive-eval
        (concat "((requiring-resolve 'nextjournal.clerk/show!) \"" filename "\")"))))
 
-  (map! :map cider-mode-map
-        "C-c M-k" #'polylith/jack-in)
+  ;;;
 
-  (map! :map cider-repl-mode-map
-        :ni "C-p" #'cider-repl-backward-input))
+  (defun +clojure/cider-jack-in-polylith (params)
+    "Start an nREPL server for the current Polylith workspace and connect to it."
+    (interactive "P")
+    (let ((ws-dir (locate-dominating-file (pwd) "workspace.edn")))
+      (if ws-dir
+          (progn
+            (message "Starting nREPL server from `%s'" ws-dir)
+            (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
+        (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
+
+  (add-to-list 'cider-connection-init-commands #'+clojure/cider-jack-in-polylith)
+
+  (map! :map cider-mode-map
+        "C-c M-k" #'+clojure/cider-jack-in-polylith)
+
+  (map! (:map cider-repl-mode-map
+         :ni "C-p" #'cider-repl-backward-input)))
 
 (use-package! clj-refactor
   :after clojure-mode
@@ -209,7 +207,7 @@
 (use-package! sesman
   :after cider
   :config
-  (defun link-cider-session ()
+  (defun +clojure/link-cider-session ()
     "Link the current buffer to a running CIDER session."
     (interactive)
     (setq sesman-system 'CIDER)
