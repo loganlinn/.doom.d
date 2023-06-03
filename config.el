@@ -94,9 +94,9 @@ Return the first (topmost) matched directory or nil if not found."
   (evil-ex-define-cmd "E" #'evil-edit)
   (evil-ex-define-cmd "Sort" #'evil-edit)
 
-  (map!
-   :nv "C-a" #'evil-numbers/inc-at-pt
-   :nv "C-S-a" #'evil-numbers/dec-at-pt))
+  (map! :map prog-mode-map ; unwanted in vterm-mode...
+        :nv "C-a" #'evil-numbers/inc-at-pt
+        :nv "C-S-a" #'evil-numbers/dec-at-pt))
 
 (use-package! evil-cleverparens
   :hook (clojure-mode . evil-cleverparens-mode)
@@ -203,6 +203,13 @@ Return the first (topmost) matched directory or nil if not found."
    :face-policy      'prepend
    :keyboard-binding "RET"))
 
+;;; :term
+
+;; https://github.com/akermu/emacs-libvterm/blob/94e2b0b2b4a750e7907dacd5b4c0584900846dd1/README.md#when-evil-mode-is-enabled-the-cursor-moves-back-in-normal-state-and-this-messes-directory-tracking
+;; TODO: test if this has a desired effect
+(add-hook! 'vterm-mode-hook
+  (evil-collection-vterm-escape-stay))
+
 ;;; :lang
 
 (after! org
@@ -210,10 +217,16 @@ Return the first (topmost) matched directory or nil if not found."
   (add-to-list 'org-modules 'ol-man))
 
 (after! nix
-  (set-formatter! 'alejandra "alejandra --quiet"
-    :modes '(nix-mode))
-  (setq +format-with 'alejandra
-        +format-with-lsp nil))
+  ;; replace nix-mode's format binding with that from doom-code-map (SPC c), i.e. format-all module
+  (map! :localleader :map nix-mode-map "p" #'+format/region-or-buffer)
+
+  (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
+  (set-formatter! 'nixpkgs-fmt "nixpkgs-fmt" :modes '(nix-mode))
+
+  (setq-hook! nix-mode
+    +format-with 'nixpkgs-fmt
+    +format-with-lsp nil))
+
 
 ;;; :lang mermaid
 ;; (use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
