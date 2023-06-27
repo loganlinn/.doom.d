@@ -21,6 +21,9 @@
 ;; (package! mermaid-mode)
 ;; (package! ob-mermaid)
 
+;;; :lang protobuf
+(package! protobuf-mode)
+
 ;;; :lang yaml
 ;; (package! k8s-mode :recipe
 ;;   (:host github
@@ -39,8 +42,11 @@
 ;; (unpin! hover)
 
 ;;; :lang just
-;; (package! just-mode)
-;; (package! justl)
+(package! just-mode)
+(package! justl)
+
+;;; :lang viml
+;; (package! vimrc-mode)
 
 ;; https://emacs.stackexchange.com/questions/75827/doom-emacs-error-running-hook-global-git-commit-mode-because-void-variable
 ;; (package! transient

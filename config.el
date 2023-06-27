@@ -12,16 +12,22 @@
       ;;doom-big-font (font-spec :family "Fira Mono" :size 19)
       )
 
-(setq fancy-splash-image (concat doom-private-dir "splash.png"))
+(setq org-directory "~/Sync/notes")
 
-;; Hide the menu for as minimalistic a startup screen as possible.
-(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+(setq fill-column 99)
+
+(setq display-line-numbers-type 'relative)
 
 (setq delete-by-moving-to-trash t)
 
-(setq-hook! display-line-numbers-mode display-line-numbers-type 'relative)
+(setq fancy-splash-image (concat doom-private-dir "splash.png"))
 
-(setq fill-column 99)
+(after! pixel-scroll
+  (pixel-scroll-precision-mode t)
+  (setq pixel-scroll-precision-use-momentum t))
+
+;; Hide the menu for as minimalistic a startup screen as possible.
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
 ;; Disable some of ligatures enabled by (ligatures +extra)
 (when (modulep! :ui ligatures +extra)
@@ -121,11 +127,7 @@ Return the first (topmost) matched directory or nil if not found."
         :desc "Reverse expand region"
         "M--" (lambda () (interactive) (er/expand-region -1))))
 
-(add-hook! (go-mode python-mode rust-mode sh-mode) #'format-all-mode)
-;; (add-hook 'nix-mode-hook #'format-all-mode)
-;; (add-hook 'python-mode-hook #'format-all-mode)
-;; (add-hook 'rust-mode-hook #'format-all-mode)
-;; (add-hook 'sh-mode-hook #'format-all-mode)
+(add-hook! (go-mode rust-mode sh-mode) #'format-all-mode)
 
 (setq +treemacs-git-mode 'deferred)
 
@@ -203,14 +205,11 @@ Return the first (topmost) matched directory or nil if not found."
    :face-policy      'prepend
    :keyboard-binding "RET"))
 
-;;; :term
-
-;; https://github.com/akermu/emacs-libvterm/blob/94e2b0b2b4a750e7907dacd5b4c0584900846dd1/README.md#when-evil-mode-is-enabled-the-cursor-moves-back-in-normal-state-and-this-messes-directory-tracking
-;; TODO: test if this has a desired effect
-(add-hook! 'vterm-mode-hook
-  (evil-collection-vterm-escape-stay))
-
 ;;; :lang
+
+(use-package! protobuf-mode :defer t)
+
+(use-package! yuck-mode :defer t)
 
 (after! org
   (setq org-directory "~/org/")
@@ -226,22 +225,6 @@ Return the first (topmost) matched directory or nil if not found."
   (setq-hook! nix-mode
     +format-with 'nixpkgs-fmt
     +format-with-lsp nil))
-
-
-;;; :lang mermaid
-;; (use-package! mermaid-mode) ;; requires mermaid-cli (mmdm command)
-;; (use-package! ob-mermaid)
-
-;;; :lang yuck
-(use-package! yuck-mode
-  :defer t)
-
-;;; :lang sh
-;; (use-package! flymake-shellcheck
-;;   :hook (sh-mode . flymake-shellcheck-load)
-;;   :commands flymake-shellcheck-load
-;;   :init
-;;   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
 
 ;;; :lang v
 ;; (use-package! v-mode

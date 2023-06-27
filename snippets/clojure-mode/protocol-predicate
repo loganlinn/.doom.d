@@ -1,0 +1,7 @@
+# key: ext?
+# name: protocol-predicate
+# --
+(defn ${1:name}?
+  "Returns x when x satisfies $2, otherwise logical false."
+  [x]
+  (when (satisfies? $2 x) x))
