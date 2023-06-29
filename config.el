@@ -1,15 +1,19 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 (setq user-full-name "Logan Linn"
-      user-mail-address "logan@llinn.dev")
+      user-mail-address "logan@loganlinn.com")
 
 (setq doom-theme 'doom-one
       doom-themes-treemacs-theme "doom-colors"
-      ;;doom-font (font-spec :family "Fira Code" :size 14 :weight 'light)
-      doom-font (font-spec :family "DejaVu Sans Mono" :size 14)
-      doom-variable-pitch-font (font-spec :family "FiraSans")
-      ;;doom-unicode-font (font-spec :family "DejaVu Sans Mono")
-      ;;doom-big-font (font-spec :family "Fira Mono" :size 19)
+      ;; doom-font (font-spec :family "monospace" :size 14) ;; fc-match monospace
+      ;; doom-font (font-spec :family "JetBrainsMono" :size 14 :weight 'light)
+      doom-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
+      ;; doom-font (font-spec :family "Victor Mono" :weight 'normal :size 14)
+      ;; doom-font (font-spec :family "Fira Code" :size 14 :weight 'light)
+      ;; doom-font (font-spec :family "Iosevka" :weight 'light :size 14)
+      ;; doom-variable-pitch-font (font-spec :family "FiraSans")
+      ;; doom-unicode-font (font-spec :family "DejaVu Sans Mono")
+      ;; doom-big-font (font-spec :family "Fira Mono" :size 19)
       )
 
 (setq org-directory "~/Sync/notes")
@@ -89,6 +93,8 @@ Return the first (topmost) matched directory or nil if not found."
   (map! :leader
         :prefix-map ("p" . "project")
         :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test))
+
+(setq lsp-file-watch-threshold 2000)
 
 (after! evil
   ;; Focus new window after splitting
