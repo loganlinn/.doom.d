@@ -225,6 +225,10 @@ Return the first (topmost) matched directory or nil if not found."
   ;; replace nix-mode's format binding with that from doom-code-map (SPC c), i.e. format-all module
   (map! :localleader :map nix-mode-map "p" #'+format/region-or-buffer)
 
+  (set-popup-rules! '(("^\\*Nix-REPL" :quit nil :ttl nil)))
+
+  (setq nix-repl-executable-args '("repl" "--file" "/home/logan/.dotfiles/repl.nix"))
+
   (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
   (set-formatter! 'nixpkgs-fmt "nixpkgs-fmt" :modes '(nix-mode))
 
@@ -244,6 +248,11 @@ Return the first (topmost) matched directory or nil if not found."
 (load! "+magit")
 (load! "+clojure")
 (load! "+crystal")
+
+(defun load-dir-local-variables ()
+  (interactive)
+  (let ((enable-local-variables :all))
+    (hack-dir-local-variables-non-file-buffer)))
 
 ;; Load per-system config
 (load! (concat "+systems/" (system-name)) (dir!) t)
