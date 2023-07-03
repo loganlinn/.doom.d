@@ -261,15 +261,16 @@ Return the first (topmost) matched directory or nil if not found."
   (let ((enable-local-variables :all))
     (hack-dir-local-variables-non-file-buffer)))
 
-(defun chmod-this-file ()
+(defun chmod-this-file (&optional path mode)
   "Set executable mode bit of current file"
   (interactive
    (list (buffer-file-name (buffer-base-buffer))
-         current-prefix-arg))
-  (unless (and buffer-file-name (file-exists-p buffer-file-name))
-    (user-error "Buffer is not visiting any file"))
-  (setq modes (read-file-modes "File modes (octal or symbolic): " buffer-file-name))
-  (chmod buffer-file-name modes))
+         (read-file-modes "File modes (octal or symbolic): "
+                          (buffer-file-name (buffer-base-buffer)))))
+  (let* ((path (or path (buffer-file-name (buffer-base-buffer)))))
+    (unless (file-exists-p path)
+     (user-error "Buffer is not visiting any file"))
+   (chmod path mode)))
 
 (map! :leader
       :prefix-map ("f" . "file")

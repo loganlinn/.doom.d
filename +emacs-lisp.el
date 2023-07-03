@@ -3,6 +3,9 @@
 (after! ielm
   (set-popup-rule! "^\\*ielm\\*$" :vslot 2 :size 0.3 :quit nil :ttl nil)
 
+  (when (modulep! :editor evil)
+    (add-to-list 'evil-insert-state-modes 'inferior-emacs-lisp-mode))
+
   (defun emacs-lisp/switch-to-last-elisp-buffer ()
     (interactive)
     (if-let* ((buf (seq-find (lambda (b)
