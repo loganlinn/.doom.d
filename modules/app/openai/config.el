@@ -16,5 +16,10 @@
   :commands (chatgpt-shell
              dall-e-shell)
   :init
-  (setq! chatgpt-shell-openai-key (lambda () (auth-source-pick-first-password :host "api.openai.com"))
-         chatgpt-shell-chatgpt-streaming t))
+    (setq! chatgpt-shell-openai-key (lambda () (auth-source-pick-first-password :host "api.openai.com"))
+         chatgpt-shell-chatgpt-streaming t)
+
+  :config
+  (set-popup-rule! "^\\*chatgpt\\*$"
+    :slot 0 :side 'right :size 100
+    :select nil :quit nil :ttl nil))

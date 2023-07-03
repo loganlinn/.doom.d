@@ -23,7 +23,7 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       company           ; the ultimate code completion backend
+       (company +childframe) ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
@@ -100,13 +100,13 @@
        (eval +overlay)     ; run code, run (also, repls)
        gist              ; interacting with github gists
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
-       lsp               ; M-x vscode
+       (lsp +peek)               ; M-x vscode
        (magit +forge)    ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        (pass +auth)      ; password manager for nerds
        ;;pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
-       ;;rgb               ; creating color strings
+       rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
        tree-sitter
        ;;terraform         ; infrastructure as code
@@ -179,7 +179,7 @@
        ;;terra             ; Earth and Moon in alignment for performance.
        (web +lsp +tree-sitter)               ; the tubes
        (yaml +lsp +tree-sitter) ; JSON, bue readable
-       (zig +lsp +tree-sitter) ; C, but simpler
+       ;; (zig +lsp +tree-sitter) ; C, but simpler
 
        :email
        ;;(mu4e +org +gmail)

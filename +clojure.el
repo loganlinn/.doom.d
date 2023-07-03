@@ -5,10 +5,20 @@
   (rainbow-delimiters-mode +1)
   (aggressive-indent-mode +1)
 
-  (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
-        (:localleader
-         (:when (modulep! :lang clojure +lsp)
-           :desc "Clean ns" "o" #'lsp-clojure-clean-ns))))
+  (map! :when (modulep! :lang clojure +lsp)
+        :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+        :localleader
+        :desc "Clean ns" "o" #'lsp-clojure-clean-ns)
+
+  ;; (when (modulep! :lang clojure +lsp)
+  ;;   ;; from lsp-semantic-tokens-suggest-overrides
+  ;;   (setq-hook! 'clojure-mode-hook
+  ;;     lsp-face-semhl-keyword 'clojure-keyword-face
+  ;;     lsp-face-semhl-interface 'font-lock-type-face
+  ;;     lsp-face-semhl-macro 'font-lock-type-face
+  ;;     lsp-face-semhl-namespace 'font-lock-type-face))
+  )
+
 
 (after! cider
   (setq cider-prompt-for-symbol nil
@@ -24,10 +34,8 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
-  (load! "+clojure/clj-decompiler")
-
+  (load! "+clojure/clj-decompiler" (dir!) t)
   ;;;
-
 
   ;; (defun +clojure/decompile-region (start end)
   ;;   "Decompile the region between START and END."
@@ -72,20 +80,15 @@
   (map! :map cider-mode-map
         "C-c M-k" #'+clojure/cider-jack-in-polylith)
 
-  (map! (:map cider-repl-mode-map
-         :ni "C-p" #'cider-repl-backward-input)))
+  (map! :map cider-repl-mode-map
+        :ni "C-p" #'cider-repl-backward-input))
 
-(use-package! clj-refactor
-  :after clojure-mode
-  :config
+(after! clj-refactor
   (map! (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
          :ni [M-return] #'cljr-add-missing-libspec)
         (:map clojure-refactor-map
          :desc "Clean ns" "o"  #'lsp-clojure-clean-ns
-         :desc "Clean ns" "C-o"  #'lsp-clojure-clean-ns
-         ;; older
-         :desc "Add missing libspec" "n a" #'cljr-add-missing-libspec
-         :desc "Clean ns" "n c" #'lsp-clojure-clean-ns))
+         :desc "Clean ns" "C-o"  #'lsp-clojure-clean-ns))
 
   (setq cljr-add-ns-to-blank-clj-files t
         cljr-insert-newline-after-require t

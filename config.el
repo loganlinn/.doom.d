@@ -33,6 +33,13 @@
 ;; Hide the menu for as minimalistic a startup screen as possible.
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
+(map! :leader
+      :prefix-map ("b" . "buffer")
+      :desc "Kill buffer*" "k" #'doom/kill-this-buffer-in-all-windows)
+;;
+(after! centaur-tabs
+  (centaur-tabs-projectile-buffer-groups))
+
 ;; Disable some of ligatures enabled by (ligatures +extra)
 (when (modulep! :ui ligatures +extra)
  (let ((ligatures-to-disable '(:true :false :int :float :str :bool :list :and :or :for)))
@@ -218,23 +225,11 @@ Return the first (topmost) matched directory or nil if not found."
 (use-package! yuck-mode :defer t)
 
 (after! org
-  (setq org-directory "~/org/")
   (add-to-list 'org-modules 'ol-man))
 
-(after! nix
-  ;; replace nix-mode's format binding with that from doom-code-map (SPC c), i.e. format-all module
-  (map! :localleader :map nix-mode-map "p" #'+format/region-or-buffer)
-
-  (set-popup-rules! '(("^\\*Nix-REPL" :quit nil :ttl nil)))
-
-  (setq nix-repl-executable-args '("repl" "--file" "/home/logan/.dotfiles/repl.nix"))
-
-  (set-formatter! 'alejandra "alejandra --quiet" :modes '(nix-mode))
-  (set-formatter! 'nixpkgs-fmt "nixpkgs-fmt" :modes '(nix-mode))
-
-  (setq-hook! nix-mode
-    +format-with 'nixpkgs-fmt
-    +format-with-lsp nil))
+(add-hook! 'sh-mode-hook
+  (if (string-match "\\.zsh$" buffer-file-name)
+      (sh-set-shell "zsh")))
 
 ;;; :lang v
 ;; (use-package! v-mode
@@ -245,14 +240,40 @@ Return the first (topmost) matched directory or nil if not found."
 ;;         "m" #'v-menu
 ;;         "f" #'v-format-buffer))
 
-(load! "+magit")
-(load! "+clojure")
-(load! "+crystal")
+(when (modulep! :tools magit)
+  (load! "+magit"))
+
+(when (modulep! :lang clojure)
+  (load! "+clojure"))
+
+(when (modulep! :lang crystal)
+  (load! "+crystal"))
+
+(when (modulep! :lang nix)
+  (load! "+nix"))
+
+(when (modulep! :lang emacs-lisp)
+  (load! "+emacs-lisp"))
 
 (defun load-dir-local-variables ()
+  "Apply directory-local variables."
   (interactive)
   (let ((enable-local-variables :all))
     (hack-dir-local-variables-non-file-buffer)))
+
+(defun chmod-this-file ()
+  "Set executable mode bit of current file"
+  (interactive
+   (list (buffer-file-name (buffer-base-buffer))
+         current-prefix-arg))
+  (unless (and buffer-file-name (file-exists-p buffer-file-name))
+    (user-error "Buffer is not visiting any file"))
+  (setq modes (read-file-modes "File modes (octal or symbolic): " buffer-file-name))
+  (chmod buffer-file-name modes))
+
+(map! :leader
+      :prefix-map ("f" . "file")
+      :desc "Change file mode bits" "M" #'chmod-this-file)
 
 ;; Load per-system config
 (load! (concat "+systems/" (system-name)) (dir!) t)
