@@ -1,23 +1,29 @@
-
-(add-hook! clojure-mode
-  (setq clojure-toplevel-inside-comment-form t)
-
-  (rainbow-delimiters-mode +1)
-  (aggressive-indent-mode +1)
+(after! clojure-mode
 
   (map! :when (modulep! :lang clojure +lsp)
         :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
         :localleader
         :desc "Clean ns" "o" #'lsp-clojure-clean-ns)
 
-  ;; (when (modulep! :lang clojure +lsp)
-  ;;   ;; from lsp-semantic-tokens-suggest-overrides
-  ;;   (setq-hook! 'clojure-mode-hook
-  ;;     lsp-face-semhl-keyword 'clojure-keyword-face
-  ;;     lsp-face-semhl-interface 'font-lock-type-face
-  ;;     lsp-face-semhl-macro 'font-lock-type-face
-  ;;     lsp-face-semhl-namespace 'font-lock-type-face))
-  )
+  ;; https://github.com/doomemacs/doomemacs/issues/7250
+  (when (modulep! :lang clojure +tree-sitter)
+    (set-tree-sitter-lang! 'clojure-mode 'clojure)
+    (set-tree-sitter-lang! 'clojurec-mode 'clojure)
+    (set-tree-sitter-lang! 'clojurescript-mode 'clojure))
+
+  (add-hook! clojure-mode
+    (setq clojure-toplevel-inside-comment-form t)
+    (rainbow-delimiters-mode +1)
+    (aggressive-indent-mode +1)
+
+    ;; (when (modulep! :lang clojure +lsp)
+    ;;   ;; from lsp-semantic-tokens-suggest-overrides
+    ;;   (setq-hook! 'clojure-mode-hook
+    ;;     lsp-face-semhl-keyword 'clojure-keyword-face
+    ;;     lsp-face-semhl-interface 'font-lock-type-face
+    ;;     lsp-face-semhl-macro 'font-lock-type-face
+    ;;     lsp-face-semhl-namespace 'font-lock-type-face))
+    ))
 
 
 (after! cider

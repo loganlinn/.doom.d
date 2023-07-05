@@ -26,11 +26,9 @@
   (when (modulep! :editor evil)
    (add-to-list 'evil-insert-state-modes 'nix-repl-mode))
 
-  ;; when switching to REPL, move cursor to prompt
-  (advice-add 'nix-repl-show :after #'comint-goto-process-mark)
-
   ;; similar binding to to cider-mode <> cider-repl-mode
-  (map! (:map nix-mode-map "C-c C-z" #'nix-repl-show)
+  (map! (:map nix-mode-map "C-c C-z" #'+nix/switch-to-repl-buffer
+              (:localleader "r" #'+nix/switch-to-repl-buffer))
         (:map nix-repl-mode-map "C-c C-z" #'+nix/switch-to-last-nix-buffer))
 
   (map! :map nix-repl-mode-map

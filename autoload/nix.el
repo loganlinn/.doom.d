@@ -12,6 +12,12 @@
       (switch-to-prev-buffer)))
 
 ;;;###autoload
+(defun +nix/switch-to-repl-buffer ()
+    (interactive)
+    (nix-repl)
+    (goto-char (point-max)))
+
+;;;###autoload
 (defun +nix/add-repl-expr (&optional expr)
   (interactive (list (read-string "Set Nix REPL expression: ")))
   (setq nix-repl-executable-args
