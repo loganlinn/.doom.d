@@ -33,21 +33,24 @@
 ;; Hide the menu for as minimalistic a startup screen as possible.
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
-(map! :leader
-      :prefix-map ("b" . "buffer")
-      :desc "Kill buffer*" "k" #'doom/kill-this-buffer-in-all-windows)
-;;
+(map! (:leader
+       :prefix-map ("b" . "buffer")
+       :desc "Kill buffer*" "k" #'doom/kill-this-buffer-in-all-windows)
+      [mouse-8] #'previous-buffer
+      [mouse-9] #'next-buffer)
+
 (after! centaur-tabs
   (centaur-tabs-projectile-buffer-groups))
 
-;; Disable some of ligatures enabled by (ligatures +extra)
 (when (modulep! :ui ligatures +extra)
+;; Disable some of ligatures enabled by (ligatures +extra)
  (let ((ligatures-to-disable '(:true :false :int :float :str :bool :list :and :or :for)))
    (dolist (sym ligatures-to-disable)
      (plist-put! +ligatures-extra-symbols sym nil))))
 
 (when (modulep! :tools lookup)
   (add-to-list '+lookup-provider-url-alist '("grep.app" "https://grep.app/search?q=%s"))
+  (add-to-list '+lookup-provider-url-alist '("github" "https://github.com/search?q=%s&type=code"))
   (setq +lookup-provider-url-alist (assoc-delete-all "Google images" +lookup-provider-url-alist))
   (setq +lookup-provider-url-alist (assoc-delete-all "Google maps" +lookup-provider-url-alist))
   (setq +lookup-provider-url-alist (assoc-delete-all "DuckDuckGo" +lookup-provider-url-alist)))
@@ -66,37 +69,9 @@
 (after! projectile
   (setq projectile-create-missing-test-files t
         projectile-project-search-path '(("~/src" . 3))
-        projectile-enable-caching nil
-        projectile-indexing-method 'alien)
-
-  (defun projectile-root-poly-workspace-dir (dir)
-    "Identify a project root in DIR by top-downsearch for Polylith workspace.edn in dir.
-Return the first (topmost) matched directory or nil if not found."
-    (locate-dominating-file dir "workspace.edn"))
-
-  (setq projectile-project-root-functions '(projectile-root-local
-                                            projectile-root-poly-workspace-dir
-                                            projectile-root-bottom-up
-                                            projectile-root-top-down
-                                            projectile-root-top-down-recurring))
-
-
-  (projectile-update-project-type 'clojure-cli
-                                  :src-dir "src"
-                                  :test-dir "test")
-
-  ;; vim-projectionist (a.vim) style commands for impl<>test files
-  ;; (evil-ex-define-cmd "A"  'projectile-toggle-between-implementation-and-test)
-  ;; (evil-ex-define-cmd "AV" '(lambda ()
-  ;;                             (interactive)
-  ;;                             (evil-window-vsplit)
-  ;;                             (windmove-right)
-  ;;                             (projectile-toggle-between-implementation-and-test)))
-  ;; (evil-ex-define-cmd "AS" '(lambda ()
-  ;;                             (interactive)
-  ;;                             (evil-window-split)
-  ;;                             (windmove-down)
-  ;;                             (projectile-toggle-between-implementation-and-test)))
+        projectile-sort-order 'recentf
+        ;; projectile-enable-caching nil
+        projectile-indexing-method 'hybrid)
   (map! :leader
         :prefix-map ("p" . "project")
         :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test))
@@ -117,9 +92,20 @@ Return the first (topmost) matched directory or nil if not found."
         :nv "C-a" #'evil-numbers/inc-at-pt
         :nv "C-S-a" #'evil-numbers/dec-at-pt))
 
+(after! (term evil)
+  (evil-collection-term-setup))
+
+;; (add-hook! 'vterm-mode-hook
+;;   (evil-collection-vterm-escape-stay))
+
 (use-package! evil-cleverparens
-  :hook (clojure-mode . evil-cleverparens-mode)
+  :after evil
   :init
+  (setq evil-cleverparens-use-regular-insert nil
+        evil-cleverparens-swap-move-by-word-and-symbol t
+        evil-cleverparens-move-skip-delimiters nil
+        evil-want-fine-undo t
+        evil-move-beyond-eol t)
   ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
   ;; 1. disable additional bindings so they aren't bound when the package loads
   (setq evil-cleverparens-use-additional-bindings nil)
@@ -131,16 +117,33 @@ Return the first (topmost) matched directory or nil if not found."
     (setq evil-cp-additional-bindings (assoc-delete-all "M-[" evil-cp-additional-bindings))
     (setq evil-cp-additional-bindings (assoc-delete-all "M-]" evil-cp-additional-bindings)))
   ;; 4. bind all the keys listed in evil-cp-additional-bindings
-  (evil-cp-set-additional-bindings))
+  (evil-cp-set-additional-bindings)
+  (evil-set-command-properties 'evil-cp-change :move-point t))
+
+(defun +loganlinn/lisp-coding-defaults ()
+  (interactive)
+  (evil-cleverparens-mode +1)
+  (turn-on-smartparens-strict-mode)
+  ;(smartparens-global-strict-mode +1)
+  (rainbow-delimiters-mode +1))
+
+(defun +loganlinn/interactive-lisp-coding-defaults ()
+  ;; interactive modes don't need whitespace checks
+  (interactive)
+  (evil-cleverparens-mode +1)
+  (turn-on-smartparens-strict-mode)
+  (rainbow-delimiters-mode +1)
+  (whitespace-mode -1))
 
 (after! expand-region
   (map! :nvi
-        :desc "Expand region"
-        "M-=" #'er/expand-region
-        :desc "Reverse expand region"
-        "M--" (lambda () (interactive) (er/expand-region -1))))
+        :desc "Expand region" "M-=" #'er/expand-region
+        :desc "Reverse expand region" "M--" (lambda () (interactive) (er/expand-region -1))))
 
-(add-hook! (go-mode rust-mode sh-mode) #'format-all-mode)
+(after! format-all
+  (add-hook! 'go-mode-hook #'format-all-mode)
+  (add-hook! 'rust-mode-hook #'format-all-mode)
+  (add-hook! 'sh-mode-hook #'format-all-mode))
 
 (setq +treemacs-git-mode 'deferred)
 

@@ -1,30 +1,37 @@
+; clojure-mode
+
 (after! clojure-mode
+  (setq clojure-toplevel-inside-comment-form t))
 
-  (map! :when (modulep! :lang clojure +lsp)
-        :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
-        :localleader
-        :desc "Clean ns" "o" #'lsp-clojure-clean-ns)
+(add-hook! clojure-mode
+  (setq clojure-toplevel-inside-comment-form t)
+  (rainbow-delimiters-mode +1)
+  (aggressive-indent-mode +1))
 
-  ;; https://github.com/doomemacs/doomemacs/issues/7250
-  (when (modulep! :lang clojure +tree-sitter)
-    (set-tree-sitter-lang! 'clojure-mode 'clojure)
-    (set-tree-sitter-lang! 'clojurec-mode 'clojure)
-    (set-tree-sitter-lang! 'clojurescript-mode 'clojure))
+(add-hook! '(clojure-mode-mode-hook cider-repl-mode-hook)
+           #'+loganlinn/lisp-coding-defaults)
 
-  (add-hook! clojure-mode
-    (setq clojure-toplevel-inside-comment-form t)
-    (rainbow-delimiters-mode +1)
-    (aggressive-indent-mode +1)
+(map! :after clojure-mode
+      (:localleader
+       (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+             "j"  #'+clojure/cider-jack-in-polylith
+             (:when (modulep! :lang clojure +lsp)
+               :desc "Clean ns" "o" #'lsp-clojure-clean-ns)
+             ;; (:prefix ("d" . "debug"))
+             ;; (:prefix ("e" . "eval"))
+             (:prefix ("g" . "goto")
+                      "t" #'projectile-find-implementation-or-test
+                      [S-t] #'projectile-find-implementation-or-test-other-window
+                      [M-t] #'projectile-find-implementation-or-test-other-frame)
+             ;; (:prefix ("h" . "help"))
+             ;; (:prefix ("i" . "inspect"))
+             ;; (:prefix ("n" . "namespace"))
+             ;; (:prefix ("p" . "print"))
+             ;; (:prefix ("r" . "repl"))
+             ;; (:prefix ("t" . "test"))
+             )))
 
-    ;; (when (modulep! :lang clojure +lsp)
-    ;;   ;; from lsp-semantic-tokens-suggest-overrides
-    ;;   (setq-hook! 'clojure-mode-hook
-    ;;     lsp-face-semhl-keyword 'clojure-keyword-face
-    ;;     lsp-face-semhl-interface 'font-lock-type-face
-    ;;     lsp-face-semhl-macro 'font-lock-type-face
-    ;;     lsp-face-semhl-namespace 'font-lock-type-face))
-    ))
-
+;; cider
 
 (after! cider
   (setq cider-prompt-for-symbol nil
@@ -40,54 +47,11 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
-  (load! "+clojure/clj-decompiler" (dir!) t)
-  ;;;
-
-  ;; (defun +clojure/decompile-region (start end)
-  ;;   "Decompile the region between START and END."
-  ;;   (let ((form (buffer-substring-no-properties start end))
-  ;;         (decompile ))
-  ;;    (cider-interactive-eval (concat
-  ;;                             "(" "(requiring-resolve 'clj-java-decompiler.core/decompile)"
-  ;;                             form
-  ;;                             ")")
-  ;;                            nil
-  ;;                            (list start end)
-  ;;                            )))
-
-  ;;;
-
-  (defun +clojure/clerk-serve ()
-    (interactive)
-    (cider-interactive-eval
-     "((requiring-resolve 'nextjournal.clerk/serve!) {:browse? true})"))
-
-  (defun +clojure/clerk-show ()
-    (interactive)
-    (when-let ((filename (buffer-file-name)))
-      (save-buffer)
-      (cider-interactive-eval
-       (concat "((requiring-resolve 'nextjournal.clerk/show!) \"" filename "\")"))))
-
-  ;;;
-
-  (defun +clojure/cider-jack-in-polylith (params)
-    "Start an nREPL server for the current Polylith workspace and connect to it."
-    (interactive "P")
-    (let ((ws-dir (locate-dominating-file (pwd) "workspace.edn")))
-      (if ws-dir
-          (progn
-            (message "Starting nREPL server from `%s'" ws-dir)
-            (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
-        (error "Unable to locate 'workspace.edn' in current directory or parent directory"))))
-
   (add-to-list 'cider-connection-init-commands #'+clojure/cider-jack-in-polylith)
-
-  (map! :map cider-mode-map
-        "C-c M-k" #'+clojure/cider-jack-in-polylith)
-
-  (map! :map cider-repl-mode-map
-        :ni "C-p" #'cider-repl-backward-input))
+  (map! (:map clojure-mode-map ;; jack-in commands belong in clojure-mode-map (NOT cider-mode-map)
+         :ni "C-c M-k" #'+clojure/cider-jack-in-polylith)
+        (:map cider-repl-mode-map
+         :ni "C-p" #'cider-repl-backward-input)))
 
 (after! clj-refactor
   (map! (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
@@ -100,67 +64,70 @@
         cljr-insert-newline-after-require t
         cljr-print-miser-width 40
         cljr-print-right-margin 80
-        ;; cljr-project-clean-functions '(lsp-clojure-clean-ns)
+        cljr-magic-requires :prompt
         cljr-slash-uses-suggest-libspec t
-        cljr-hotload-dependencies nil
+        cljr-clojure-test-declaration "[clojure.test :as test]"
         cljr-magic-require-namespaces
-        '(;; Clojure
-          ("as"    . "clojure.core.async")
-          ("csv"   . "clojure.data.csv")
-          ("edn"   . "clojure.edn")
-          ("io"    . "clojure.java.io")
-          ("log"   . "clojure.tools.logging")
-          ("mat"   . "clojure.core.matrix")
-          ("nrepl" . "clojure.nrepl")
-          ("pp"    . "clojure.pprint")
-          ("s"     . "clojure.spec.alpha")
-          ("set"   . "clojure.set")
-          ("sh"    . "clojure.java.shell")
-          ("spec"  . "clojure.spec.alpha")
-          ("str"   . "clojure.string")
-          ("walk"  . "clojure.walk")
-          ("xml"   . "clojure.data.xml")
-          ("zip"   . "clojure.zip")
-          ;; Others
+        '(
+          ("as"       . "clojure.core.async")
+          ("csv"      . "clojure.data.csv")
+          ("deferred" . "manifold.deferred")
+          ("edn"      . "clojure.edn")
           ("http"     . "clj-http.client")
+          ("io"       . "clojure.java.io")
           ("json"     . "cheshire.core")
+          ("jt"       . "java-time")
+          ("log"      . "clojure.tools.logging")
           ("m"        . "malli.core")
+          ("mat"      . "clojure.core.matrix")
+          ("me"       . "malli.error")
+          ("mi"       . "malli.instrument")
+          ("mr"       . "malli.registry")
+          ("mt"       . "malli.transform")
+          ("mu"       . "malli.util")
+          ("nrepl"    . "clojure.nrepl")
           ("p"        . "plumbing.core")
+          ("pp"       . "clojure.pprint")
+          ("s"        . "clojure.spec.alpha")
+          ("set"      . "clojure.set")
+          ("sh"       . "clojure.java.shell")
+          ("spec"     . "clojure.spec.alpha")
           ("sql"      . "honey.sql")
           ("sqlh"     . "honey.sql.helpers")
-          ("jt"       . "java-time")
-          ("yaml"     . "clj-yaml.core"))))
+          ("str"      . "clojure.string")
+          ("stream"   . "manifold.stream")
+          ("walk"     . "clojure.walk")
+          ("xml"      . "clojure.data.xml")
+          ("yaml"     . "clj-yaml.core")
+          ("zip"      . "clojure.zip")
+          )))
 
-  (use-package! evil-cleverparens
-    :after evil
-    :init
-    (setq evil-cleverparens-use-regular-insert nil
-          evil-cleverparens-swap-move-by-word-and-symbol t
-          evil-cleverparens-move-skip-delimiters nil
-          evil-want-fine-undo t
-          evil-move-beyond-eol t)
-    :config
-    (evil-set-command-properties 'evil-cp-change :move-point t)
+;; projectile
 
-    (add-hook! 'emacs-lisp-mode-hook
-      (evil-cleverparens-mode t)
-      (smartparens-strict-mode t))
+(defun projectile-root-poly-workspace-dir (dir)
+  "Identify a project root in DIR by top-downsearch for Polylith workspace.edn
+in dir. Return the first (topmost) matched directory or nil if not found."
+  (locate-dominating-file dir "workspace.edn"))
 
-    (add-hook! 'clojure-mode-hook
-      (evil-cleverparens-mode t)
-      (smartparens-strict-mode t))
+(after! projectile
+  (projectile-update-project-type 'clojure-cli :src-dir "src" :test-dir "test")
 
-    (add-hook! 'cider-repl-mode-hook
-      (evil-cleverparens-mode t)
-      (smartparens-strict-mode t)))
+  (setq-hook! 'clojure-mode-hook
+    projectile-project-root-functions
+    '(projectile-root-local
+      projectile-root-poly-workspace-dir
+      projectile-root-bottom-up
+      projectile-root-top-down
+      projectile-root-top-down-recurring)))
 
-(use-package! sesman
-  :after cider
-  :config
-  (defun +clojure/link-cider-session ()
-    "Link the current buffer to a running CIDER session."
-    (interactive)
-    (setq sesman-system 'CIDER)
-    (sesman-link-with-buffer)))
+;; tree-sitter
 
+(after! (:and clojure-mode tree-siter)
+  ;; fix for https://github.com/doomemacs/doomemacs/issues/7250
+  (set-tree-sitter-lang! 'clojurec-mode 'clojure)
+  (set-tree-sitter-lang! 'clojurescript-mode 'clojure))
+
+
+
+(load! "+clojure/clj-decompiler")
 (load! "+clojure/portal")

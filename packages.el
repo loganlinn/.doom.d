@@ -12,10 +12,16 @@
 ;;; :ui
 (package! button-lock)
 
+;;; :tools magit
+(package! gh-notify)
+
 ;;; :lang clojure, emacs-lisp
 (package! aggressive-indent)
 (package! evil-cleverparens)
 (package! zprint-mode)
+
+;;; :lang dot
+(package! graphviz-dot-mode)
 
 ;;; :lang mermaid
 ;; (package! mermaid-mode)
@@ -24,22 +30,8 @@
 ;;; :lang protobuf
 (package! protobuf-mode)
 
-;;; :lang yaml
-;; (package! k8s-mode :recipe
-;;   (:host github
-;;    :repo "loganlinn/emacs-k8s-mode"))
-
 ;;; :lang yuck
 (package! yuck-mode)
-
-;;; :term
-; (package! term-keys :recipe (:host github :repo "CyberShadow/term-keys" :files ("*.el")))
-
-;; FIXME needed? if so, document why...
-;; (unpin! lsp-treemacs)
-;; (unpin! lsp-ui)
-;; (unpin! treemacs)
-;; (unpin! hover)
 
 ;;; :lang just
 (package! just-mode)
