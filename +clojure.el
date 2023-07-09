@@ -1,15 +1,13 @@
 ; clojure-mode
 
-(after! clojure-mode
-  (setq clojure-toplevel-inside-comment-form t))
+(add-hook! 'clojure-mode-hook #'+loganlinn/lisp-coding-defaults)
+
+(add-hook! 'cider-repl-mode-hook #'+loganlinn/lisp-coding-defaults)
 
 (add-hook! clojure-mode
   (setq clojure-toplevel-inside-comment-form t)
-  (rainbow-delimiters-mode +1)
   (aggressive-indent-mode +1))
 
-(add-hook! '(clojure-mode-mode-hook cider-repl-mode-hook)
-           #'+loganlinn/lisp-coding-defaults)
 
 (map! :after clojure-mode
       (:localleader
@@ -71,8 +69,10 @@
         '(
           ("as"       . "clojure.core.async")
           ("csv"      . "clojure.data.csv")
+          ("cli"      . "babashka.cli")
           ("deferred" . "manifold.deferred")
           ("edn"      . "clojure.edn")
+          ("fs"       . "babshka.fs")
           ("http"     . "clj-http.client")
           ("io"       . "clojure.java.io")
           ("json"     . "cheshire.core")
@@ -86,7 +86,7 @@
           ("mt"       . "malli.transform")
           ("mu"       . "malli.util")
           ("nrepl"    . "clojure.nrepl")
-          ("p"        . "plumbing.core")
+          ("process"  . "babashka.process")
           ("pp"       . "clojure.pprint")
           ("s"        . "clojure.spec.alpha")
           ("set"      . "clojure.set")
@@ -122,7 +122,7 @@ in dir. Return the first (topmost) matched directory or nil if not found."
 
 ;; tree-sitter
 
-(after! (:and clojure-mode tree-siter)
+(after! tree-siter
   ;; fix for https://github.com/doomemacs/doomemacs/issues/7250
   (set-tree-sitter-lang! 'clojurec-mode 'clojure)
   (set-tree-sitter-lang! 'clojurescript-mode 'clojure))

@@ -37,4 +37,5 @@
         :ni "C-r" #'comint-history-isearch-backward-regexp
         :ni "C-l" #'comint-clear-buffer
         :ni "C-u" #'comint-kill-input
+        :i "C-d" #'delete-forward-char
         :n "RET" #'comint-send-input))

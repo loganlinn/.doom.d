@@ -4,6 +4,8 @@
 
 (add-hook! 'lisp-mode-hook #'+loganlinn/lisp-coding-defaults)
 
+(add-hook! 'lisp-data-mode-hook #'+loganlinn/lisp-coding-defaults)
+
 (after! ielm
   (set-popup-rule! "^\\*ielm\\*$" :vslot 2 :size 0.3 :quit nil :ttl nil)
 

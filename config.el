@@ -4,16 +4,21 @@
       user-mail-address "logan@loganlinn.com")
 
 (setq doom-theme 'doom-one
-      doom-themes-treemacs-theme "doom-colors"
       ;; doom-font (font-spec :family "monospace" :size 14) ;; fc-match monospace
       ;; doom-font (font-spec :family "JetBrainsMono" :size 14 :weight 'light)
       doom-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
       ;; doom-font (font-spec :family "Victor Mono" :weight 'normal :size 14)
       ;; doom-font (font-spec :family "Fira Code" :size 14 :weight 'light)
       ;; doom-font (font-spec :family "Iosevka" :weight 'light :size 14)
+      ;; doom-variable-pitch-font (font-spec :family "monospace")
+      doom-variable-pitch-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
+      ;; doom-variable-pitch-font (font-spec :family "Noto Sans" :size 13)
       ;; doom-variable-pitch-font (font-spec :family "FiraSans")
       ;; doom-unicode-font (font-spec :family "DejaVu Sans Mono")
       ;; doom-big-font (font-spec :family "Fira Mono" :size 19)
+      doom-themes-treemacs-theme "doom-colors"
+      doom-themes-treemacs-enable-variable-pitch nil
+      ;; doom-themes-treemacs-enable-variable-pitch t
       )
 
 (setq org-directory "~/Sync/notes")
@@ -33,9 +38,14 @@
 ;; Hide the menu for as minimalistic a startup screen as possible.
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
+;;
+;;; <leader>
+
 (map! (:leader
-       :prefix-map ("b" . "buffer")
-       :desc "Kill buffer*" "k" #'doom/kill-this-buffer-in-all-windows)
+       (:when (modulep! :completion vertico)
+         :desc "Resume last search" "\"" #'vertico-repeat-select)
+       (:prefix-map ("b" . "buffer")
+        :desc "Kill buffer*" "k" #'doom/kill-this-buffer-in-all-windows))
       [mouse-8] #'previous-buffer
       [mouse-9] #'next-buffer)
 
@@ -55,13 +65,12 @@
   (setq +lookup-provider-url-alist (assoc-delete-all "Google maps" +lookup-provider-url-alist))
   (setq +lookup-provider-url-alist (assoc-delete-all "DuckDuckGo" +lookup-provider-url-alist)))
 
-(when (modulep! :completion vertico +childframe)
- (after! vertico-posframe
-   vertico-posframe-poshandler #'posframe-poshandler-frame-top-center
-   vertico-posframe-truncate-lines t
-   vertico-posframe-width 150
-   vertico-posframe-min-height 1
-   vertico-posframe-border-width 1))
+(after! vertico-posframe
+  vertico-posframe-poshandler #'posframe-poshandler-frame-top-center
+  vertico-posframe-truncate-lines t
+  vertico-posframe-width 150
+  vertico-posframe-min-height 1
+  vertico-posframe-border-width 1)
 
 (after! which-key
   (setq which-key-idle-delay 0.4))
@@ -70,6 +79,7 @@
   (setq projectile-create-missing-test-files t
         projectile-project-search-path '(("~/src" . 3))
         projectile-sort-order 'recentf
+        projectile-current-project-on-switch 'move-to-end
         ;; projectile-enable-caching nil
         projectile-indexing-method 'hybrid)
   (map! :leader
@@ -104,6 +114,7 @@
   (setq evil-cleverparens-use-regular-insert nil
         evil-cleverparens-swap-move-by-word-and-symbol t
         evil-cleverparens-move-skip-delimiters nil
+        evil-cleverparens-complete-parens-in-yanked-region nil
         evil-want-fine-undo t
         evil-move-beyond-eol t)
   ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
@@ -134,6 +145,14 @@
   (turn-on-smartparens-strict-mode)
   (rainbow-delimiters-mode +1)
   (whitespace-mode -1))
+
+(defun +loganlinn/kill-matching-buffers (regexp)
+  "Kill buffers whose name matches the specified REGEXP.
+Ignores buffers whose name starts with a space, unless optional
+prefix argument INTERNAL-TOO is non-nil.  Asks before killing
+each buffer, unless NO-ASK is non-nil."
+  (interactive "sKill buffers matching this regular expression: \nP")
+  (kill-matching-buffers regexp false true))
 
 (after! expand-region
   (map! :nvi
