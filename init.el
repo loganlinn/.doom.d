@@ -16,6 +16,9 @@
 
 (setq byte-compile-warnings '(not obsolete))
 
+(if IS-MAC
+  (setenv "LIBRARY_PATH" "/opt/homebrew/Cellar/gcc/13.1.0/bin:/opt/homebrew/Cellar/libgccjit/13.1.0/lib/gcc/current:/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/current/gcc/aarch64-apple-darwin22/13"))
+
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
@@ -193,7 +196,7 @@
        ;;irc               ; how neckbeards socialize
        (rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
-       openai
+       (:if IS-LINUX openai)
 
        :config
        ;;literate

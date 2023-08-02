@@ -30,3 +30,15 @@
         (message "Starting nREPL server from `%s'" ws-dir)
         (cider-jack-in-clj (plist-put params :project-dir ws-dir)))
     (error "Unable to locate 'workspace.edn' in current directory or parent directory")))
+
+;;;###autoload
+(defun +clojure-lsp/register-remote-client (clojure-lsp-executable)
+  (interactive)
+  (let ((clojure-lsp (or (executable-find "clojure-lsp")
+                         (user-error "Couldn't find clojure-lsp installed on your system"))))
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-tramp-connection clojure-lsp)
+                      :major-modes '(clojure-mode)
+                      ;;:language-id "clojure"
+                      :remote? t
+                      :server-id 'clojure-lsp-remote))))
