@@ -106,23 +106,14 @@
   (add-to-list 'projectile-other-file-alist '("cljc" . ("clj" "cljs")))
   (add-to-list 'projectile-other-file-alist '("edn" . ("clj"))))
 
+(use-package! vertico-posframe
+  :after-call vertico
+  :config
+  (add-hook 'doom-after-reload-hook #'posframe-delete-all))
+
 (after! vertico
-  (setq vertico-resize t)
-  (vertico-indexed-mode 1))
-
-(use-package! vertico-multiform
-  :after vertico
-  :commands vertico-multiform-mode
-  :hook (vertico-mode . vertico-multiform-mode))
-
-(after! (:and vertico savehist)
-  (add-to-list 'savehist-additional-variables
-               'vertico-repeat-history))
-
-(after! (:and vertico-posframe vertico-multiform)
-
+  (vertico-indexed-mode 1)
   ;; vertico-posframe + vertico
-
   ;; Temporary toggling between the different display modes is possible.
   ;; The following keys are bound in the `vertico-multiform-map'.
   ;;
@@ -135,14 +126,7 @@
   ;; NOTE: vertico-posframe-mode will be activated/deactivated by vertico-multiform-mode
   ;; dynamically when you add ‘posframe’ setting to vertico-multiform-commands,
   ;; please *do not enable vertico-posframe-mode globally at the moment.*
-
-
-  ;; Alist of commands/regexps and list of settings to turn on per command.
-  ;; Takes precedence over `vertico-multiform-categories'.  A setting
-  ;; can either be a mode symbol, a function, an inverted mode symbol
-  ;; or function, or a cons cell of variable name and value.  The key
-  ;; t can be used to specify catch all/default settings.  The value
-  ;; of `this-command' is used as key for the lookup.
+  (vertico-multiform-mode 1)
   (setq vertico-multiform-commands
         '((consult-ripgrep buffer)
           (consult-git-grep buffer)
@@ -156,12 +140,16 @@
           (+default/search-other-cwd buffer)
           (+default/search-notes-for-symbol-at-point buffer)
           (+default/search-emacsd buffer)
+          (projectile-find-file posframe
+                                (vertico-posframe-poshandler . posframe-poshandler-frame-center)
+                                (vertico-posframe-border-width . 4)
+                                (vertico-posframe-fallback-mode . vertico-buffer-mode))
           (consult-line posframe
-                        (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+                        (vertico-posframe-poshandler . posframe-poshandler-frame-center)
                         (vertico-posframe-border-width . 4)
                         (vertico-posframe-fallback-mode . vertico-buffer-mode))
           (consult-imenu reverse buffer)
-          (t buffer))
+          (t posframe))
 
         ;; Alist of categories/regexps and list of settings to turn on per category.
         ;; See `vertico-multiform-commands' on details about the settings.  The
@@ -170,16 +158,12 @@
         '((imenu (:not indexed mouse))
           (symbol (vertico-sort-function . vertico-sort-alpha))))
 
-  (vertico-multiform-mode 1)
-
   (setq vertico-posframe-fallback-mode 'vertico-buffer-mode
         vertico-posframe-size-function #'vertico-posframe-get-size
         vertico-posframe-truncate-lines t
         vertico-posframe-border-width 3
         vertico-posframe-parameters '((left-fringe . 10)
-                                      (right-fringe . 10)
-                                      (x-pixel-offset . 0)
-                                      (y-pixel-offset . -1000)))
+                                      (right-fringe . 10)))
   ;; The builtin poshandler functions:
   ;; 1.  `posframe-poshandler-frame-center'
   ;; 2.  `posframe-poshandler-frame-top-center'
@@ -203,6 +187,10 @@
   ;; 20. `posframe-poshandler-point-frame-center'
   (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center))
 
+(after! (:and vertico savehist)
+  (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
+
+
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode t)
   (setq-hook! 'pixel-scroll-mode
@@ -223,18 +211,6 @@
                                  "patch-tech"
                                  "plumatic"
                                  "omcljs"))))
-
-;; (use-package! magit-delta
-;;   :hook (magit-mode . magit-delta-mode))
-
-(use-package! code-review
-  ;; ;; https://github.com/wandersoncferreira/code-review#configuration
-  ;; (add-hook! 'code-review-mode-hook
-  ;;   (lambda ()
-  ;;     ;; include *Code-Review* buffer into current workspace
-  ;;     (persp-add-buffer (current-buffer))))
-  )
-
 
 ;;; :editor
 
@@ -407,26 +383,27 @@
   (evil-cp-set-additional-bindings)
   (evil-cleverparens-mode 1))
 
-(add-hook! clojure-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! clojurec-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! clojurescript-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! cider-repl-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! common-lisp-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! emacs-lisp-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! eshell-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! fennel-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! fennel-repl-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! geiser-repl-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! gerbil-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! inferior-emacs-lisp-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! inferior-lisp-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! inferior-scheme-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! lisp-data-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! lisp-interaction-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! lisp-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! scheme-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! yuck-mode #'+loganlinn/turn-on-lisp-modes)
-(add-hook! janet-mode #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'clojure-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'clojurec-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'clojurescript-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'cider-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'common-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'emacs-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'lisp-data-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'eshell-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'fennel-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'fennel-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'geiser-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'gerbil-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'inferior-emacs-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'inferior-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'inferior-scheme-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'lisp-data-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'lisp-interaction-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'scheme-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'yuck-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! 'janet-mode-hook #'+loganlinn/turn-on-lisp-modes)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
