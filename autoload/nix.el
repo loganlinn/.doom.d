@@ -13,18 +13,48 @@
 
 ;;;###autoload
 (defun +nix/switch-to-repl-buffer ()
-    (interactive)
-    (nix-repl)
-    (goto-char (point-max)))
+  (interactive)
+  (nix-repl)
+  (goto-char (point-max)))
+
+;;;###autoload
+(defun +nix/set-repl-file (&optional file)
+  (interactive "Fnix repl file: ")
+  (setq nix-repl-executable-args `("repl" "--file" ,file))
+  (message (concat "Set nix-repl to use " file)))
 
 ;;;###autoload
 (defun +nix/add-repl-expr (&optional expr)
-  (interactive (list (read-string "Set Nix REPL expression: ")))
-  (setq nix-repl-executable-args
-   (append nix-repl-executable-args `("--expr" ,expr))))
+  (interactive (read-string "Set Nix REPL expression: "))
+  (setq nix-repl-executable-args (append nix-repl-executable-args `("--expr" ,expr))))
 
 ;;;###autoload
-(defun +nix/add-repl-file (&optional file)
-  (interactive (list (read-file-name "Set Nix REPL file: ")))
-  (setq nix-repl-executable-args
-   (append nix-repl-executable-args `("--file" ,file))))
+(defun +nix/detect-repl-file ()
+  (interactive)
+  (if-let ((root (projectile-locate-dominating-file default-directory "repl.nix")))
+      (+nix/set-repl-file (file-name-concat root "repl.nix"))
+    (if-let ((root (projectile-locate-dominating-file default-directory "shell.nix")))
+        (+nix/set-repl-file (file-name-concat root "shell.nix"))
+      (user-error "No repl.nix or shell.nix detected"))))
+
+;;;###autoload
+(defun +nix/alejandra (&optional output-buffer error-buffer display-error-buffer)
+  (interactive (list current-prefix-arg shell-command-default-error-buffer t))
+  (shell-command-on-region
+   (point-min) (point-max)
+   "nix run nixpkgs#alejandra --quiet -"
+   (or output-buffer (current-buffer))
+   t
+   error-buffer
+   display-error-buffer))
+
+;;;###autoload
+(defun +nix/nixpkgs-fmt (&optional output-buffer error-buffer display-error-buffer)
+  (interactive (list current-prefix-arg shell-command-default-error-buffer t))
+  (shell-command-on-region
+   (point-min) (point-max)
+   "nix run nixpkgs#nixpkgs-fmt --quiet -"
+   (or output-buffer (current-buffer))
+   t
+   error-buffer
+   display-error-buffer))

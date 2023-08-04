@@ -4,57 +4,25 @@
 (require 'easymenu)
 
 (after! cider
-  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.40.0")
+  (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.44.0")
 
   (defun +clojure/portal-open ()
     (interactive)
-    (cider-interactive-eval
-     "(do
-(in-ns 'user)
-
-(require '[portal.api :as portal]
-         '[clojure.datafy :refer [datafy]])
-
-(defonce portal nil)
-
-(defn portal-submit [x]
-  (portal.api/submit
-   (cond-> x
-     (instance? Exception x)
-     (-> clojure.datafy/datafy
-         (assoc :runtime :jvm)))))
-
-;; needs graceful degredation
-#_(defn portal-inspect [x]
-  (portal/inspect x))
-
-(defn portal-open! []
-  (defonce portal-shutdown-hook-added
-    (.addShutdownHook (Runtime/getRuntime) (Thread. #'portal/close)))
-  (alter-var-root #'portal portal/open #_{:launcher :emacs})
-  (add-tap #'portal-submit)
-  portal)
-
-(defn portal-close! []
-  (when portal
-    (alter-var-root #'portal portal/close)
-    (remove-tap #'portal-submit)))
-
-(defn portal-clear! []
-  (when portal
-    (portal/clear portal)))
-
-(portal-open!))"))
+    ;; TODO probably can add doom dir to class path for a normal require
+    (cider-load-buffer
+     (find-file-noselect
+      (file-name-concat doom-user-dir "+clojure" "src" "user" "portal.clj")))
+    (cider-interactive-eval "(user.portal/open!)"))
 
   (defun +clojure/portal-clear ()
     (interactive)
     (cider-interactive-eval
-     "((or (requiring-resolve 'user/portal-clear!) (constantly nil)))"))
+     "((or (requiring-resolve 'user.portal/clear!) (constantly nil)))"))
 
   (defun +clojure/portal-close ()
     (interactive)
     (cider-interactive-eval
-     "((or (requiring-resolve 'user/portal-close!) (constantly nil)))"))
+     "((or (requiring-resolve 'user.portal/close!) (constantly nil)))"))
 
   (defun +clojure/portal-docs ()
     (interactive)

@@ -1,0 +1,7 @@
+{:deps    {djblue/portal                             {:mvn/version "0.40.0"}
+           io.github.nextjournal/clerk               {:mvn/version "0.13.842"}
+           philoskim/debux                           {:mvn/version "0.8.2"}
+           com.clojure-goes-fast/clj-java-decompiler {:mvn/version "0.3.4"}
+           criterium/criterium                       {:mvn/version "0.4.6"}
+           clj-kondo/clj-kondo                       {:mvn/version "2023.03.17"}}
+ :aliases {}}
