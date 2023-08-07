@@ -77,8 +77,12 @@
 
  (:after vertico
   :map vertico-map
-  :desc "Quick insert" "M-q" #'vertico-quick-insert
-  :desc "Quick exit" "C-q" #'vertico-quick-exit)
+  :desc "Quick insert" [M-q] #'vertico-quick-insert
+  :desc "Quick exit" [C-q] #'vertico-quick-exit
+  ;; vertico-exit completes with first suggestion, while
+  ;; vertico-exit-input completes with current input.
+  ;; This distinction is needed when, for example, an existing file is being renamed.
+  :desc "Exit with input" [M-return] #'vertico-exit-input)
 
  (:after company
   :map company-active-map
