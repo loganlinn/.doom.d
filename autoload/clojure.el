@@ -126,3 +126,38 @@ Default value is `clojure-thread-all-but-last'."
                       ;;:language-id "clojure"
                       :remote? t
                       :server-id 'clojure-lsp-remote))))
+
+;;;###autoload
+(defun +clojure/cursor-info ()
+  (interactive)
+  (lsp-request "clojure/cursorInfo/raw"
+               (lsp-make-clojure-cursor-info-params
+                :textDocument (lsp-make-text-document-identifier :uri (lsp--buffer-uri))
+                :position (lsp-make-position :line (- (line-number-at-pos) 1)
+                                             :character (current-column)))))
+
+;;;###autoload
+(defun +clojure/cursor-elements ()
+  (interactive)
+  (mapcar (lambda (el) (gethash "element" el)) (gethash "elements" (+clojure/cursor-info))))
+
+;;;###autoload
+(defun +clojure/cursor-definitions ()
+  (interactive)
+  (mapcar (lambda (el) (gethash "definition" el)) (gethash "elements" (+clojure/cursor-info))))
+
+;;;###autoload
+(defun +clojure/copy-reference ()
+  "Yanks qualified reference for definition at cursor"
+  (interactive)
+  (let* ((definition (or (car (+clojure/cursor-definitions))
+                         (user-error "Could find cursor definitions.")))
+         (namespace (or (gethash "ns" definition)
+                        (user-error "Definition does not have namespace")))
+         (name (or (gethash "name" definition)
+                   (user-error "Definition does not have name")))
+         (ref (concat namespace "/" name)))
+    (kill-new ref)
+    (if (string= ref (car kill-ring))
+        (message "Copied reference: %s" ref)
+      (user-error "Couldn't copy reference in current buffer"))))

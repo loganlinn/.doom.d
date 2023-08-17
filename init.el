@@ -26,7 +26,7 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company +childframe +tng) ; the ultimate code completion backend
+       (company +childframe) ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
@@ -110,7 +110,7 @@
        (eval +overlay)     ; run code, run (also, repls)
        gist              ; interacting with github gists
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
-       (lsp +peek)               ; M-x vscode
+       lsp               ; M-x vscode
        (magit +forge)    ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        (pass +auth)      ; password manager for nerds
@@ -169,7 +169,19 @@
        ;;nim               ; python + lisp at the speed of c
        (nix +lsp +tree-sitter)  ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
-       (org +roam2 +brain +hugo +dragndrop +present +pretty +pomodoro) ; organize your plain life in plain text
+       (org
+        +dragndrop
+        +gnuplot
+        +jupyter
+        +noter
+        +pandoc
+        +pomodoro
+        +present
+        +pretty
+        ;; +brain
+        ;; +hugo
+        ;; +roam2
+        ) ; organize your plain life in plain text
        ;;php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional

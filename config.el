@@ -31,8 +31,12 @@
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
 
 (map!
- [mouse-8] #'previous-buffer
- [mouse-9] #'next-buffer
+ [mouse-8] #'switch-to-prev-buffer
+ [mouse-9] #'switch-to-next-buffer
+ [f12] #'+lookup/definition
+ [S-f12] #'+lookup/references
+ [C-f12] #'+lookup/implementations
+
  (:leader
   (:prefix-map ("b" . "buffer")
    ;; kill more aggressively
@@ -44,7 +48,16 @@
    :desc "Change file mode bits" "M" #'chmod-this-file
    :desc "Ranger" "g" #'ranger)
   (:prefix-map ("q" . "quit/session")
-   :desc "Quit Emacs without saving"    "!" #'evil-quit-all-with-error-code))
+   :desc "Quit Emacs without saving"    "!" #'evil-quit-all-with-error-code)
+  (:prefix-map ("c" . "code")
+   (:when (and (modulep! :tools lsp) (not (modulep! :tools lsp +eglot)))
+     (:when (modulep! :completion vertico)
+       :desc "Jump to symbol in current workspace" "j"   #'consult-lsp-file-symbols ;; default is #'consult-lsp-symbols
+       :desc "Jump to symbol in any workspace"     "J"   #'consult-lsp-symbols))))
+
+(:map view-mode-map ; i.e. read-only files
+  ;; unmap 0 for expected evil-beginning-of-line behavior
+  :n "0" nil)
 
  (:after treemacs
   :map treemacs-mode-map
@@ -56,14 +69,18 @@
   :nvi :desc "Expand region" "M-=" #'er/expand-region
   :nvi :desc "Reverse expand region" "M--" (cmd! (er/expand-region -1)))
 
- (:after evil
-  :map prog-mode-map ; unwanted in term modes
-  :nv "C-a" #'evil-numbers/inc-at-pt
-  :nv "C-S-a" #'evil-numbers/dec-at-pt)
+  (:after evil
+  (:map prog-mode-map ; unwanted in term modes
+   :nv "C-a" #'evil-numbers/inc-at-pt
+   :nv "C-S-a" #'evil-numbers/dec-at-pt))
 
  (:after lsp-mode
-  :ni :desc "Code actions..." [M-return] #'lsp-execute-code-action
-  :nvi :desc "Rename" [S-f6] #'lsp-rename)
+  :map lsp-mode-map
+  ;; :desc "Find definition" [f12] #'lsp-find-definition
+  :desc "Find references" [S-f12] #'lsp-find-references
+  :desc "Find implementations" [C-f12] #'lsp-find-implementation
+  :desc "Code actions..." [M-return] #'lsp-execute-code-action
+  :desc "Rename" [S-f6] #'lsp-rename)
 
  (:after flycheck
   :map flycheck-mode-map
@@ -86,8 +103,9 @@
 
  (:after company
   :map company-active-map
-  [prior] #'company-previous-page
-  [next] #'company-page-next))
+  [prior] #'company-previous-page ;; i.e. PgUp
+  [next] #'company-page-next ;; i.e. PgDn
+  ))
 
 ;;; :ui
 
@@ -226,7 +244,18 @@
   ;; thicc finger support
   (evil-ex-define-cmd "W" #'evil-write)
   (evil-ex-define-cmd "E" #'evil-edit)
-  (evil-ex-define-cmd "Sort" #'evil-edit))
+  (evil-ex-define-cmd "Sort" #'evil-edit)
+
+  ;; https://github.com/tpope/vim-fugitive
+  (when (modulep! :emacs vc)
+   (evil-ex-define-cmd "Gre ad" #'vc-revert)
+   (evil-ex-define-cmd "Gdiff" #'vc-diff)
+   (evil-ex-define-cmd "Ggrep`'" #'vc-git-grep)
+   (evil-ex-define-cmd "GMove" #'vc-rename-file)
+   (evil-ex-define-cmd "GDelete" #'vc-delete-file)
+   (evil-ex-define-cmd "GBrowse" #'+vc/browse-at-remote))
+  (when (modulep! :tools magit)
+    (evil-ex-define-cmd "Gwrite" #'magit-stage-file)))
 
 (after! (term evil)
   (evil-collection-term-setup))
@@ -291,10 +320,37 @@
 (after! lsp-mode
   (setq lsp-log-io nil
         lsp-file-watch-threshold 8264
-        lsp-headerline-breadcrumb-enable nil
         lsp-enable-indentation t
-        lsp-enable-on-type-formatting t
-        lsp-lens-enable t)
+        lsp-enable-on-type-formatting t)
+
+  ;; completion
+  (setq lsp-completion-enable t
+        ;; lsp-completion-enable-additional-text-edit
+        ;; lsp-completion-filter-on-incomplete
+        ;; lsp-completion-no-cache
+        ;; lsp-completion-provider
+        ;; lsp-completion-show-detail t
+        ;; lsp-completion-show-kind t
+        ;; lsp-completion-show-label-description
+        ;; lsp-completion-sort-initial-results
+        ;; lsp-completion-use-last-result
+        ;; lsp-enable-snippet t
+        )
+
+  ;; lens
+  (setq lsp-lens-enable t
+        lsp-lens-debounce-interval 0.001
+        ;; lsp-lens-place-position  #'above-line
+        lsp-lens-place-position  #'end-of-line)
+
+  ;; headerline
+  (setq lsp-headerline-breadcrumb-enable nil)
+
+  ;; modeline
+  (setq lsp-modeline-workspace-status-enable t
+        lsp-modeline-code-actions-enable t
+        lsp-modeline-diagnostics-enable t
+        lsp-modeline-diagnostics-scope :file)
 
   (dolist (dir '("[/\\\\]\\.ccls-cache\\'"
                  "[/\\\\]\\.mypy_cache\\'"
@@ -370,7 +426,8 @@
 
   (rainbow-delimiters-mode 1)
 
-  (aggressive-indent-mode 1)
+  ;; does not respect :style/indent metadata...
+  ;; (aggressive-indent-mode 1)
 
   (smartparens-global-mode 1)
   (turn-on-smartparens-strict-mode)
