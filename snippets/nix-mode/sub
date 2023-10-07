@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: types.submodule
+# uuid:
+# key: sub
+# condition: t
+# --
+types.submodule ${1:({config, ...\}: }{
+  options = {
+    `yas/selected-text`$0
+  };${1:$(if (> (length yas-text) 0) "\n\n  config = {};\n")}
+}${1:$(if (> (length yas-text) 0) ")")};
