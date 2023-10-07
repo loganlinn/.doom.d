@@ -13,210 +13,164 @@
       doom-one-brighter-comments nil)
 
 (setq doom-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
-      ;; (font-spec :family "monospace" :size 14) ;; fc-match monospace
-      ;; (font-spec :family "JetBrainsMono" :size 14 :weight 'light)
-      ;; (font-spec :family "Victor Mono" :weight 'normal :size 14)
-      ;; (font-spec :family "Fira Code" :size 14 :weight 'light)
-      ;; (font-spec :family "Iosevka" :weight 'light :size 14)
       doom-variable-pitch-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
-      ;; (font-spec :family "monospace")
-      ;; (font-spec :family "Noto Sans" :size 13)
-      ;; (font-spec :family "FiraSans")
-      ;; doom-big-font (font-spec :family "Fira Mono" :size 19)
-      ;; doom-unicode-font (font-spec :family "DejaVu Sans Mono")
       doom-themes-treemacs-theme "doom-colors"
-      doom-themes-treemacs-enable-variable-pitch nil
-      doom-scratch-initial-major-mode t)
+      doom-themes-treemacs-enable-variable-pitch nil)
 
-(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-
-(map!
- [mouse-8] #'switch-to-prev-buffer
- [mouse-9] #'switch-to-next-buffer
- [f12] #'+lookup/definition
- [S-f12] #'+lookup/references
- [C-f12] #'+lookup/implementations
-
- (:leader
-  (:prefix-map ("b" . "buffer")
-   ;; kill more aggressively
-   :desc "Kill buffer everywhere"       "k" #'doom/kill-this-buffer-in-all-windows
-   :desc "Kill matching buffers"        "/" #'doom/kill-matching-buffers)
-  (:prefix-map ("p" . "project")
-   :desc "Kill other project buffers"    "K" #'doom/kill-project-buffers)
-  (:prefix-map ("f" . "file")
-   :desc "Change file mode bits" "M" #'chmod-this-file
-   :desc "Ranger" "g" #'ranger)
-  (:prefix-map ("q" . "quit/session")
-   :desc "Quit Emacs without saving"    "!" #'evil-quit-all-with-error-code)
-  (:prefix-map ("c" . "code")
-   (:when (and (modulep! :tools lsp) (not (modulep! :tools lsp +eglot)))
-     (:when (modulep! :completion vertico)
-       :desc "Jump to symbol in current workspace" "j"   #'consult-lsp-file-symbols ;; default is #'consult-lsp-symbols
-       :desc "Jump to symbol in any workspace"     "J"   #'consult-lsp-symbols))))
-
-(:map view-mode-map ; i.e. read-only files
-  ;; unmap 0 for expected evil-beginning-of-line behavior
-  :n "0" nil)
-
- (:after treemacs
-  :map treemacs-mode-map
-  :desc "Expand" [mouse-1] #'treemacs-single-click-expand-action
-  :desc "Rename file" [f2] #'treemacs-rename-file
-  :desc "Refresh" [f5] #'treemacs-refresh)
-
- (:after expand-region
-  :nvi :desc "Expand region" "M-=" #'er/expand-region
-  :nvi :desc "Reverse expand region" "M--" (cmd! (er/expand-region -1)))
-
-  (:after evil
-  (:map prog-mode-map ; unwanted in term modes
-   :nv "C-a" #'evil-numbers/inc-at-pt
-   :nv "C-S-a" #'evil-numbers/dec-at-pt))
-
- (:after lsp-mode
-  :map lsp-mode-map
-  ;; :desc "Find definition" [f12] #'lsp-find-definition
-  :desc "Find references" [S-f12] #'lsp-find-references
-  :desc "Find implementations" [C-f12] #'lsp-find-implementation
-  :desc "Code actions..." [M-return] #'lsp-execute-code-action
-  :desc "Rename" [S-f6] #'lsp-rename)
-
- (:after flycheck
-  :map flycheck-mode-map
-  :desc "Jump to next error" [f2]   #'flycheck-next-error
-  :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
-
- (:after projectile
-  :leader
-  :prefix-map ("p" . "project")
-  :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test)
-
- (:after vertico
-  :map vertico-map
-  :desc "Quick insert" [M-q] #'vertico-quick-insert
-  :desc "Quick exit" [C-q] #'vertico-quick-exit
-  ;; vertico-exit completes with first suggestion, while
-  ;; vertico-exit-input completes with current input.
-  ;; This distinction is needed when, for example, an existing file is being renamed.
-  :desc "Exit with input" [M-return] #'vertico-exit-input)
-
- (:after company
-  :map company-active-map
-  [prior] #'company-previous-page ;; i.e. PgUp
-  [next] #'company-page-next ;; i.e. PgDn
-  ))
-
-;;; :ui
-
-(use-package! alert
-  :commands alert
-  :config
-  (setq alert-default-style 'notifications))
-
-(after! projectile
-  (setq projectile-create-missing-test-files t
-        projectile-project-search-path '(("~/src" . 3))
-        projectile-sort-order 'recentf
-        projectile-current-project-on-switch 'move-to-end
-        projectile-enable-caching nil
-        ;; projectile-indexing-method 'hybrid ;; disabled due issues with files that exist not being reported
-        projectile-indexing-method 'alien)
-
-  (add-to-list 'projectile-other-file-alist '("clj" . ("cljc" "cljs")))
-  (add-to-list 'projectile-other-file-alist '("cljs" . ("cljc" "clj")))
-  (add-to-list 'projectile-other-file-alist '("cljc" . ("clj" "cljs")))
-  (add-to-list 'projectile-other-file-alist '("edn" . ("clj"))))
-
-(use-package! vertico-posframe
-  :after-call vertico
-  :config
-  (add-hook 'doom-after-reload-hook #'posframe-delete-all))
-
-(after! vertico
-  (vertico-indexed-mode 1)
-  ;; vertico-posframe + vertico
-  ;; Temporary toggling between the different display modes is possible.
-  ;; The following keys are bound in the `vertico-multiform-map'.
-  ;;
-  ;;   M-V -> `vertico-multiform-vertical'
-  ;;   M-G -> `vertico-multiform-grid'
-  ;;   M-F -> `vertico-multiform-flat'
-  ;;   M-R -> `vertico-multiform-reverse'
-  ;;   M-U -> `vertico-multiform-unobtrusive'
-
-  ;; NOTE: vertico-posframe-mode will be activated/deactivated by vertico-multiform-mode
-  ;; dynamically when you add ‘posframe’ setting to vertico-multiform-commands,
-  ;; please *do not enable vertico-posframe-mode globally at the moment.*
-  (vertico-multiform-mode 1)
-  (setq vertico-multiform-commands
-        '((consult-ripgrep buffer)
-          (consult-git-grep buffer)
-          (consult-grep buffer)
-          (consult-bookmark buffer)
-          (consult-recent-file buffer)
-          (+default/search-project buffer)
-          (+default/search-other-project buffer)
-          (+default/search-project-for-symbol-at-point buffer)
-          (+default/search-cwd buffer)
-          (+default/search-other-cwd buffer)
-          (+default/search-notes-for-symbol-at-point buffer)
-          (+default/search-emacsd buffer)
-          (projectile-find-file posframe
-                                (vertico-posframe-poshandler . posframe-poshandler-frame-center)
-                                (vertico-posframe-border-width . 4)
-                                (vertico-posframe-fallback-mode . vertico-buffer-mode))
-          (consult-line posframe
-                        (vertico-posframe-poshandler . posframe-poshandler-frame-center)
-                        (vertico-posframe-border-width . 4)
-                        (vertico-posframe-fallback-mode . vertico-buffer-mode))
-          (consult-imenu reverse buffer)
-          (t posframe))
-
-        ;; Alist of categories/regexps and list of settings to turn on per category.
-        ;; See `vertico-multiform-commands' on details about the settings.  The
-        ;; category settings have lower precedence than
-        vertico-multiform-categories
-        '((imenu (:not indexed mouse))
-          (symbol (vertico-sort-function . vertico-sort-alpha))))
-
-  (setq vertico-posframe-fallback-mode 'vertico-buffer-mode
-        vertico-posframe-size-function #'vertico-posframe-get-size
-        vertico-posframe-truncate-lines t
-        vertico-posframe-border-width 3
-        vertico-posframe-parameters '((left-fringe . 10)
-                                      (right-fringe . 10)))
-  ;; The builtin poshandler functions:
-  ;; 1.  `posframe-poshandler-frame-center'
-  ;; 2.  `posframe-poshandler-frame-top-center'
-  ;; 3.  `posframe-poshandler-frame-top-left-corner'
-  ;; 4.  `posframe-poshandler-frame-top-right-corner'
-  ;; 5.  `posframe-poshandler-frame-top-left-or-right-other-corner'
-  ;; 6.  `posframe-poshandler-frame-bottom-center'
-  ;; 7.  `posframe-poshandler-frame-bottom-left-corner'
-  ;; 8.  `posframe-poshandler-frame-bottom-right-corner'
-  ;; 9.  `posframe-poshandler-window-center'
-  ;; 10.  `posframe-poshandler-window-top-center'
-  ;; 11. `posframe-poshandler-window-top-left-corner'
-  ;; 12. `posframe-poshandler-window-top-right-corner'
-  ;; 13. `posframe-poshandler-window-bottom-center'
-  ;; 14. `posframe-poshandler-window-bottom-left-corner'
-  ;; 15. `posframe-poshandler-window-bottom-right-corner'
-  ;; 16. `posframe-poshandler-point-top-left-corner'
-  ;; 17. `posframe-poshandler-point-bottom-left-corner'
-  ;; 18. `posframe-poshandler-point-bottom-left-corner-upward'
-  ;; 19. `posframe-poshandler-point-window-center'
-  ;; 20. `posframe-poshandler-point-frame-center'
-  (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center))
-
-(after! (:and vertico savehist)
-  (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
-
+;; (add-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+(add-to-list '+doom-dashboard-menu-sections
+             '("Open daily note"
+               :icon (nerd-icons-faicon "nf-fa-calendar" :face 'doom-dashboard-menu-title)
+               :when (featurep! :lang org +journal)
+               :face (:inherit (doom-dashboard-menu-title bold))
+               :action org-roam-dailies-goto-today))
 
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode t)
   (setq-hook! 'pixel-scroll-mode
     pixel-scroll-precision-use-momentum t))
+
+(setq +lookup-provider-url-alist
+      (append '(("github :: code" "https://github.com/search?q=%s&type=code")
+                ("github :: stars" "https://github.com/loganlinn?tab=stars&q=%s"))
+              (mapcar (fn! (list (concat "grep.app" (when % (concat " :: " %)))
+                                 (concat "https://grep.app/search?q=%s"
+                                         (when % (concat "&filter[lang][0]=" (url-encode-url %))))))
+                      '(nil "Clojure" "Emacs Lisp" "Go" "Lua" "Nix" "Python" "Rust" "Shell"))
+              '(("mvn" "https://mvnrepository.com/search?q=%s")
+                ("gmail" "https://mail.google.com/mail/u/0/#search/%s")
+                ("fastmail" "https://app.fastmail.com/mail/search:%s"))))
+
+(map! :leader
+      (:prefix-map ("b" . "buffer")
+       :desc "Kill buffer everywhere"     "k" #'doom/kill-this-buffer-in-all-windows
+       :desc "Kill matching buffers"      "/" #'doom/kill-matching-buffers)
+
+      (:prefix-map ("p" . "project")
+       :desc "Kill other project buffers" "K" #'doom/kill-project-buffers)
+
+      (:prefix-map ("f" . "file")
+       :desc "chmod"                      "M" #'chmod-this-file
+       :desc "ranger"                     "g" #'ranger)
+
+      (:prefix-map ("q" . "quit/session")
+       :desc "Quit Emacs without saving"  "!" #'evil-quit-all-with-error-code)
+
+      (:prefix-map ("c" . "code")
+       :when (modulep! :completion vertico)
+       :when (and (modulep! :tools lsp) (not (modulep! :tools lsp +eglot)))
+       :desc "Jump to symbol in current workspace" "j"   #'consult-lsp-file-symbols ;; default is #'consult-lsp-symbols
+       :desc "Jump to symbol in any workspace"     "J"   #'consult-lsp-symbols)
+
+      (:prefix-map ("g" . "git")
+       (:when (modulep! :tools magit)
+         ;; don't ask for file; use current (magit-stage-file behavior changed?)
+         :desc "Git stage diff"            "w"   #'magit-diff-staged
+         :desc "Git stage file"            "S"   (cmd!! #'magit-stage-buffer-file #'magit-staged-files)
+         :desc "Git unstage file"          "U"   (cmd!! #'magit-unstage-buffer-file #'magit-staged-files)
+         (:prefix ("o" . "open in browser")
+          :desc "Browse assigned requests" "a" (cmd! (browse-url "https://github.com/pulls/assigned"))
+          :desc "Browse review requests"   "R" (cmd! (browse-url "https://github.com/pulls/review-requested"))
+          :desc "Graphite dashboard"       "g" (cmd! (browse-url "https://app.graphite.dev/")))))
+      )
+
+(map! [mouse-8] #'switch-to-prev-buffer
+      [mouse-9] #'switch-to-next-buffer
+      [f12]     #'+lookup/definition
+      [S-f12]   #'+lookup/references
+      [C-f12]   #'+lookup/implementations
+
+      (:after expand-region
+       :nvi :desc "Expand region" "M-=" #'er/expand-region
+       :nvi :desc "Reverse expand region" "M--" (cmd! (er/expand-region -1)))
+
+      (:after evil
+       :map prog-mode-map ; unwanted in term modes
+       :nv "C-a" #'evil-numbers/inc-at-pt
+       :nv "C-S-a" #'evil-numbers/dec-at-pt)
+
+      (:after evil
+       :map view-mode-map ; i.e. read-only files
+       :n "0" #'evil-beginning-of-line)
+
+      (:after company
+       :map company-active-map
+       [prior] #'company-previous-page
+       [next] #'company-page-next)
+
+      (:after vertico
+       :map vertico-map
+       :desc "Quick insert" [M-q] #'vertico-quick-insert
+       :desc "Quick exit" [C-q] #'vertico-quick-exit
+       ;; vertico-exit completes with first suggestion, while
+       ;; vertico-exit-input completes with current input.
+       ;; This distinction is needed when, for example, an existing file is being renamed.
+       :desc "Exit with input" [M-return] #'vertico-exit-input)
+
+      (:after projectile
+       :leader
+       :prefix-map ("p" . "project")
+       :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test)
+
+      (:after treemacs
+       :map treemacs-mode-map
+       :desc "Expand" [mouse-1] #'treemacs-single-click-expand-action
+       :desc "Rename file" [f2] #'treemacs-rename-file
+       :desc "Refresh" [f5] #'treemacs-refresh)
+
+      (:after flycheck
+       :map flycheck-mode-map
+       :desc "Jump to next error" [f2]   #'flycheck-next-error
+       :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
+
+      (:after lsp-mode
+       :map lsp-mode-map
+       ;; :desc "Find definition" [f12] #'lsp-find-definition
+       :desc "Find references" [S-f12] #'lsp-find-references
+       :desc "Find implementations" [C-f12] #'lsp-find-implementation
+       :desc "Code actions..." [M-return] #'lsp-execute-code-action
+       :desc "Rename" [S-f6] #'lsp-rename))
+
+(set-popup-rules!
+  ;;  `help-mode', `helpful-mode' (same as default, excl :quit)
+  '(("^\\*\\([Hh]elp\\|Apropos\\)" :slot 2 :vslot -8 :size 0.42 :select t :quit 'current)
+    ("^\\*Async Shell Command" :vslot -5 :select t :quit t :ttl 10)))
+
+;;; packages
+
+(use-package! evil-cleverparens
+  :after evil smartparens
+  :init
+  ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
+  (setq evil-cleverparens-use-additional-bindings nil)
+  :config
+  ;; When using terminal emacs, remap M-[ and M-], to M-b and M-B, respectively
+  (unless window-system
+    (setq evil-cp-additional-bindings (assoc-delete-all "M-[" evil-cp-additional-bindings))
+    (setq evil-cp-additional-bindings (assoc-delete-all "M-]" evil-cp-additional-bindings))
+    (add-to-list 'evil-cp-additional-bindings '("M-b" . evil-cp-wrap-next-square))
+    (add-to-list 'evil-cp-additional-bindings '("M-B" . evil-cp-wrap-previous-square)))
+
+  (evil-set-command-properties 'evil-cp-change :move-point t)
+  ;; enable these text-objects globally
+  (require 'evil-cleverparens-text-objects)
+  (add-hook! 'evil-cleverparens-mode-hook
+    (evil-cp-set-additional-movement-keys)
+    (evil-cp-set-additional-bindings))
+
+  (setq evil-cleverparens-use-regular-insert nil
+        evil-cleverparens-swap-move-by-word-and-symbol t
+        evil-cleverparens-move-skip-delimiters nil
+        evil-cleverparens-complete-parens-in-yanked-region nil
+        evil-want-fine-undo t
+        evil-move-beyond-eol t))
+
+(use-package! highlight-parenthesis
+  :defer t)
+
+(use-package! fence-edit
+  :commands fence-edit-code-region fence-edit-code-region-with-mode fence-edit-code-at-point fence-edit-dwim)
 
 (after! which-key
   (setq which-key-idle-delay 0.4))
@@ -224,7 +178,20 @@
 (after! treemacs
   (treemacs-project-follow-mode +1))
 
-(after! (centaur-tabs projectile)
+(after! projectile
+  (setq projectile-create-missing-test-files t
+        projectile-project-search-path '(("~/src" . 3))
+        projectile-sort-order 'recently-active ;; recently active buffers and recently opened files
+        projectile-current-project-on-switch 'move-to-end
+        projectile-enable-caching nil
+        ;; projectile-indexing-method 'hybrid ;; disabled due issues with files that exist not being reported
+        projectile-indexing-method 'alien)
+  (add-to-list 'projectile-other-file-alist '("clj" . ("cljc" "cljs")))
+  (add-to-list 'projectile-other-file-alist '("cljs" . ("cljc" "clj")))
+  (add-to-list 'projectile-other-file-alist '("cljc" . ("clj" "cljs")))
+  (add-to-list 'projectile-other-file-alist '("edn" . ("clj"))))
+
+(after! (:and projectile centaur-tabs)
   (centaur-tabs-projectile-buffer-groups))
 
 (after! forge
@@ -233,6 +200,16 @@
                                  "patch-tech"
                                  "plumatic"
                                  "omcljs"))))
+
+;; TODO configure this for Linear ticket references
+;; (use-package! bug-reference
+;;   :defer t
+;;   :config
+;;   (defun bug-reference--url-handler ()
+;;     (print! "bug-reference-bug-regexp matched %s, %s" (match-string 1) (match-string 2))
+;;     nil)
+;;  (setq-local bug-reference-bug-regexp "\\(\\b\\(?:[Bb]ug ?#?\\|[Pp]atch ?#\\|RFE ?#\\|PR [a-z+-]+/\\|PAT-\\)\\([0-9]+\\(?:#[0-9]+\\)?\\)\\)"
+;;        bug-reference-url-format #'bug-reference--url-handler))
 
 ;;; :editor
 
@@ -254,41 +231,14 @@
    (evil-ex-define-cmd "GMove" #'vc-rename-file)
    (evil-ex-define-cmd "GDelete" #'vc-delete-file)
    (evil-ex-define-cmd "GBrowse" #'+vc/browse-at-remote))
+
   (when (modulep! :tools magit)
     (evil-ex-define-cmd "Gwrite" #'magit-stage-file)))
-
-(after! (term evil)
-  (evil-collection-term-setup))
 
 (after! format-all
   (add-hook! 'go-mode-hook #'format-all-mode)
   (add-hook! 'rust-mode-hook #'format-all-mode)
   (add-hook! 'sh-mode-hook #'format-all-mode))
-
-(use-package! evil-cleverparens
-  :after evil smartparens
-  :init
-  ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
-  (setq evil-cleverparens-use-additional-bindings nil)
-  :config
-  (evil-set-command-properties 'evil-cp-change :move-point t)
-
-  ;; enable these text-objects globally
-  (require 'evil-cleverparens-text-objects)
-
-  (setq evil-cleverparens-use-regular-insert nil
-        evil-cleverparens-swap-move-by-word-and-symbol t
-        evil-cleverparens-move-skip-delimiters nil
-        evil-cleverparens-complete-parens-in-yanked-region nil
-        evil-want-fine-undo t
-        evil-move-beyond-eol t))
-
-(use-package! highlight-parenthesis
-  :defer t)
-
-;; (add-hook! 'vterm-mode-hook
-;;   (evil-collection-vterm-escape-stay))
-
 
 ;;; :checkers
 
@@ -313,10 +263,6 @@
 (after! gist
   (setq gist-view-gist t))
 
-(when (modulep! :tools lookup)
-  (add-to-list '+lookup-provider-url-alist '("grep.app" "https://grep.app/search?q=%s"))
-  (add-to-list '+lookup-provider-url-alist '("github" "https://github.com/search?q=%s&type=code")))
-
 (after! lsp-mode
   (setq lsp-log-io nil
         lsp-file-watch-threshold 8264
@@ -324,7 +270,7 @@
         lsp-enable-on-type-formatting t)
 
   ;; completion
-  (setq lsp-completion-enable t
+  (setq ;; lsp-completion-enable t
         ;; lsp-completion-enable-additional-text-edit
         ;; lsp-completion-filter-on-incomplete
         ;; lsp-completion-no-cache
@@ -339,8 +285,6 @@
 
   ;; lens
   (setq lsp-lens-enable t
-        lsp-lens-debounce-interval 0.001
-        ;; lsp-lens-place-position  #'above-line
         lsp-lens-place-position  #'end-of-line)
 
   ;; headerline
@@ -349,7 +293,7 @@
   ;; modeline
   (setq lsp-modeline-workspace-status-enable t
         lsp-modeline-code-actions-enable t
-        lsp-modeline-diagnostics-enable t
+        lsp-modeline-diagnostics-enable nil
         lsp-modeline-diagnostics-scope :file)
 
   (dolist (dir '("[/\\\\]\\.ccls-cache\\'"
@@ -388,6 +332,12 @@
 (after! lsp-treemacs
   (setq lsp-treemacs-error-list-current-project-only t))
 
+(use-package! aggressive-indent
+  :commands aggressive-indent-mode aggressive-indent-global-mode
+  :config
+  ;; (setq aggressive-indent-region-function #'+format/region)
+  (setq aggressive-indent-region-function #'indent-region))
+
 (use-package! button-lock
   :defer t
   :config
@@ -400,11 +350,43 @@
    :face-policy      'prepend
    :keyboard-binding "RET"))
 
-;;; :lang
+(use-package! crux
+  :commands
+  crux-open-with
+  crux-smart-kill-line
+  crux-smart-open-line-above
+  crux-smart-open-line
+  crux-cleanup-buffer-or-region
+  crux-recentf-find-file
+  crux-recentf-find-directory
+  crux-view-url
+  crux-eval-and-replace
+  crux-transpose-windows
+  crux-delete-file-and-buffer
+  crux-copy-file-preserve-attributes
+  crux-duplicate-current-line-or-region
+  crux-duplicate-and-comment-current-line-or-region
+  crux-rename-file-and-buffer
+  crux-visit-term-buffer
+  crux-kill-other-buffers
+  crux-indent-defun
+  crux-indent-rigidly-and-copy-to-clipboard
+  crux-find-user-init-file
+  crux-find-user-custom-file
+  crux-find-shell-init-file
+  crux-top-join-line
+  crux-kill-whole-line
+  crux-kill-line-backwards
+  crux-kill-and-join-forward
+  crux-kill-buffer-truename
+  crux-ispell-word-then-abbrev
+  crux-upcase-region
+  crux-downcase-region
+  crux-capitalize-region
+  crux-other-window-or-switch-buffer)
 
-(after! org
-  (setq org-directory (or (getenv "XDG_NOTES_DIR") "~/Sync/notes"))
-  (add-to-list 'org-modules 'ol-man))
+(use-package! keycast
+  :commands keycast-mode)
 
 (use-package! protobuf-mode
   :defer t)
@@ -412,28 +394,30 @@
 (use-package! yuck-mode
   :defer t)
 
+;; (use-package! minions
+;;   :defer t
+;;   :config
+;;   (map! "<S-down-mouse-3>" #'minions-minor-modes-menu))
+
+;;; :lang
+
+(after! org
+  (setq org-directory (or (getenv "XDG_NOTES_DIR") "~/Sync/notes/")) ;; yes, trailing slash
+  (setq org-display-remote-inline-images t)
+  (add-to-list 'org-modules 'ol-man))
+
 (add-hook! 'sh-mode-hook
   (when (string-match "\\.zsh$" buffer-file-name)
     (sh-set-shell "zsh")))
 
-(load! "+clojure")
-(load! "+crystal")
-(load! "+nix")
-(load! "+emacs-lisp")
-
-(defun +loganlinn/turn-on-lisp-modes ()
+(defun ll/turn-on-lisp-modes ()
   (interactive)
-
   (rainbow-delimiters-mode 1)
-
   ;; does not respect :style/indent metadata...
   ;; (aggressive-indent-mode 1)
-
   (smartparens-global-mode 1)
   (turn-on-smartparens-strict-mode)
-
   (setq evil-cleverparens-use-additional-bindings t)
-
   ;; When using terminal emacs, remap M-[ and M-], to M-b and M-B, respectively
   (unless window-system
     (setq evil-cp-additional-bindings (assoc-delete-all "M-[" evil-cp-additional-bindings))
@@ -444,29 +428,110 @@
   (evil-cp-set-additional-bindings)
   (evil-cleverparens-mode 1))
 
-(add-hook! 'clojure-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'clojurec-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'clojurescript-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'cider-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'common-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'emacs-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'lisp-data-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'eshell-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'fennel-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'fennel-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'geiser-repl-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'gerbil-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'inferior-emacs-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'inferior-lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'inferior-scheme-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'lisp-data-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'lisp-interaction-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'lisp-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'scheme-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'yuck-mode-hook #'+loganlinn/turn-on-lisp-modes)
-(add-hook! 'janet-mode-hook #'+loganlinn/turn-on-lisp-modes)
+(add-hook! ('clojure-mode-hook
+            'cider-repl-mode-hook
+            'common-lisp-mode-hook
+            'emacs-lisp-mode-hook
+            'eval-expression-minibuffer-setup-hook
+            'lisp-data-mode-hook
+            'eshell-mode-hook
+            'fennel-mode-hook
+            'fennel-repl-mode-hook
+            'geiser-repl-mode-hook
+            'gerbil-mode-hook
+            'inferior-emacs-lisp-mode-hook ;; ielm
+            'inferior-lisp-mode-hook
+            'inferior-scheme-mode-hook
+            'lisp-data-mode-hook
+            'lisp-interaction-mode-hook
+            'lisp-mode-hook
+            'scheme-mode-hook
+            'yuck-mode-hook
+            'janet-mode-hook)
+           :append #'ll/turn-on-lisp-modes)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package! kubel
+  :commands
+  kubel
+  kubel-quick-edit
+  kubel-mode
+  kubel-yaml-editing-mode
+  kubel-get-resource-details
+  kubel-set-kubectl-config-file
+  kubel-set-context
+  kubel-set-namespace
+  kubel-set-resource
+  kubel-copy-popup
+  kubel-delete-popup
+  kubel-exec-popup
+  kubel-log-popup
+  kubel-port-forward-pod
+  :config
+
+  (set-popup-rules!
+    '(("^\\*kubel stderr" :size 0.25 :select nil :quit t :ttl 10)
+      ("^\\*kubel-process" :size 0.3 :select nil :quit 'current)
+      ("^\\*kubel - port-forward" :size 0.3 :select nil :quit 'current :ttl 0)
+      ("\\*kubel-drawer\\*" :slot 1 :side right :size 0.5 :select t :quit nil)
+      ("^\\*kubel " :ignore t)))
+
+(defun +kubel/show ()
+  (interactive)
+  (with-current-buffer (get-buffer-create " *kubel-drawer*")
+    (kubel-mode)
+    (+popup-buffer-mode 1)
+    (pop-to-buffer-same-window (current-buffer))))
+
+  (map! (:leader (:prefix-map ("o" . "open") "k" #'kubel))
+        (:localleader
+         (:map kubel-mode-map
+          :desc "Help Popup" "'" #'kubel-evil-help-popup
+          :desc "Port forward" "p" #'kubel-port-forward-pod
+          :desc "Logs" "l" #'kubel-log-popup
+          :desc "Exec" "e" #'kubel-exec-popup
+          :desc "Jab" "j" #'kubel-jab-deployment
+          :desc "Scale replicas" "S" #'kubel-scale-replicas
+          :desc "Copy to clipboad..." "c" #'kubel-copy-popup
+          :desc "Show Process buffer" "$" #'kubel-show-process-buffer
+          (:prefix ("a" . "action")
+           :desc "Resource details" "RET" #'kubel-describe-popup
+           :desc "Quick edit" "E" #'kubel-quick-edit
+           :desc "Refresh" "g" #'kubel
+           :desc "Delete" "k" #'kubel-delete-popup
+           :desc "Rollout" "r" #'kubel-rollout-history)
+          (:prefix ("s" . "settings")
+           :desc "Set context" "C" #'kubel-set-context
+           :desc "Set namespace" "n" #'kubel-set-namespace
+           :desc "Set resource" "R" #'kubel-set-resource
+           :desc "Set kubectl config file" "K" #'kubel-set-kubectl-config-file
+           :desc "Set output format" "F" #'kubel-set-output-format)
+          (:prefix ("f" . "filter")
+           :desc "Filter" "f" #'kubel-set-filter
+           :desc "Next highlight" "M-n" #'kubel-jump-to-next-highlight
+           :desc "Previous highlight" "M-p" #'kubel-jump-to-previous-highlight
+           :desc "Set label selector" "s" #'kubel-set-label-selector)
+          (:prefix ("m" . "marking")
+           :desc "Mark item" "m" #'kubel-mark-item
+           :desc "Unmark item" "u" #'kubel-unmark-item
+           :desc "Mark all items" "M" #'kubel-mark-all
+           :desc "Unmark all items" "U" #'kubel-unmark-all)))))
+
+(use-package! kubel-evil
+  :when (modulep! :editor evil)
+  :hook (kubel-mode . kubel-evil-mode))
+
+(after! (:and kubel vterm)
+  (kubel-vterm-setup))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(load! "+vertico")
+(load! "+clojure")
+(load! "+crystal")
+(load! "+nix")
+(load! "+emacs-lisp")
 (load! (concat "+systems/" (system-name)) nil t)
 (load! "+local" nil t)

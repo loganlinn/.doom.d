@@ -16,8 +16,7 @@
 
 (setq byte-compile-warnings '(not obsolete))
 
-(if IS-MAC
-  (setenv "LIBRARY_PATH" "/opt/homebrew/Cellar/gcc/13.1.0/bin:/opt/homebrew/Cellar/libgccjit/13.1.0/lib/gcc/current:/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/current/gcc/aarch64-apple-darwin22/13"))
+;; (if IS-MAC (setenv "LIBRARY_PATH" "/opt/homebrew/Cellar/gcc/13.1.0/bin:/opt/homebrew/Cellar/libgccjit/13.1.0/lib/gcc/current:/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/current/gcc/aarch64-apple-darwin22/13"))
 
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
@@ -30,13 +29,6 @@
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-
-       ;; NOTE: Not using +childframe in order to use vertico-posframe and vertico-multiform-mode.
-       ;;       Doom's vertico module enables posframe-mode globally, but multiform-mode wants to
-       ;;       handles this dynamically.
-       ;;       See note here: https://github.com/tumashu/vertico-posframe#how-to-let-vertico-posframe-work-well-with-vertico-multiform
-       ;;
-       ;;       In the meantime, vertico-posframe is manually added to packages.el.
        (vertico +icons)
 
        :ui
@@ -101,107 +93,105 @@
 
        :tools
        ;;ansible
-       ;;biblio            ; Writes a PhD for you (citation needed)
-       ;;debugger          ; FIXME stepping through code, to help you add bugs
+       ;;biblio                      ; Writes a PhD for you (citation needed)
+       ;;debugger                    ; FIXME stepping through code, to help you add bugs
        direnv
        docker
-       editorconfig      ; let someone else argue about tabs vs spaces
-       ;;ein               ; tame Jupyter notebooks with emacs
-       (eval +overlay)     ; run code, run (also, repls)
-       gist              ; interacting with github gists
+       editorconfig                  ; let someone else argue about tabs vs spaces
+       ;;ein                         ; tame Jupyter notebooks with emacs
+       (eval +overlay)               ; run code, run (also, repls)
+       gist                          ; interacting with github gists
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
-       lsp               ; M-x vscode
-       (magit +forge)    ; a git porcelain for Emacs
-       make              ; run make tasks from Emacs
-       (pass +auth)      ; password manager for nerds
-       pdf               ; pdf enhancements
-       prodigy           ; FIXME managing external services & code builders
-       rgb               ; creating color strings
-       taskrunner        ; taskrunner for all your projects
+       lsp                           ; M-x vscode
+       (magit +forge)                ; a git porcelain for Emacs
+       make                          ; run make tasks from Emacs
+       (pass +auth)                  ; password manager for nerds
+       pdf                           ; pdf enhancements
+       prodigy                       ; FIXME managing external services & code builders
+       rgb                           ; creating color strings
+       ;; taskrunner                 ; taskrunner for all your projects
        tree-sitter
-       ;;terraform         ; infrastructure as code
-       ;;tmux              ; an API for interacting with tmux
-       ;;upload            ; map local to remote projects via ssh/ftp
+       terraform                     ; infrastructure as code
+       ;;tmux                        ; an API for interacting with tmux
+       ;;upload                      ; map local to remote projects via ssh/ftp
        bpr
 
        :os
-       (:if IS-MAC macos)  ; improve compatibility with macOS
-       (tty +osc)         ; improve the terminal Emacs experience
+       (:if IS-MAC macos)             ; improve compatibility with macOS
+       (tty +osc)                     ; improve the terminal Emacs experience
 
        :lang
-       ;;agda              ; types of types of types of types...
-       ;;beancount         ; mind the GAAP
-       (cc +lsp)         ; C > C++ == 1
-       (clojure +lsp +tree-sitter) ; java with a lisp
-       ;;common-lisp       ; if you've seen one lisp, you've seen them all
-       ;;coq               ; proofs-as-programs
-       ;;crystal           ; ruby at the speed of c
-       ;;csharp            ; unity, .NET, and mono shenanigans
-       data              ; config/data formats
-       ;;(dart +flutter)   ; paint ui and not much else
+       ;;agda                         ; types of types of types of types...
+       ;;beancount                    ; mind the GAAP
+       (cc +lsp)                      ; C > C++ == 1
+       (clojure +lsp +tree-sitter)    ; java with a lisp
+       ;;common-lisp                  ; if you've seen one lisp, you've seen them all
+       ;;coq                          ; proofs-as-programs
+       ;;crystal                      ; ruby at the speed of c
+       ;;csharp                       ; unity, .NET, and mono shenanigans
+       data                           ; config/data formats
+       ;;(dart +flutter)              ; paint ui and not much else
        ;;dhall
-       ;;elixir            ; erlang done right
-       (elm +lsp +tree-sitter) ; care for a cup of TEA?
-       emacs-lisp        ; drown in parentheses
-       ;;erlang            ; an elegant language for a more civilized age
-       ;;ess               ; emacs speaks statistics
+       ;;elixir                       ; erlang done right
+       (elm +lsp +tree-sitter)        ; care for a cup of TEA?
+       emacs-lisp                     ; drown in parentheses
+       ;;erlang                       ; an elegant language for a more civilized age
+       ;;ess                          ; emacs speaks statistics
        ;;factor
-       ;;faust             ; dsp, but you get to keep your soul
-       ;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
-       ;;fsharp            ; ML stands for Microsoft's Language
-       ;;fstar             ; (dependent) types and (monadic) effects and Z3
-       ;;gdscript          ; the language you waited for
-       (go +lsp)         ; the hipster dialect
-       (graphql +lsp)    ; Give queries a REST
-       (haskell +lsp)    ; a language that's lazier than I am
-       ;;hy                ; readability of scheme w/ speed of python
-       ;;idris             ; a language you can depend on
-       json              ; At least it ain't XML
+       ;;faust                        ; dsp, but you get to keep your soul
+       ;;fortran                      ; in FORTRAN, GOD is REAL (unless declared INTEGER)
+       ;;fsharp                       ; ML stands for Microsoft's Language
+       ;;fstar                        ; (dependent) types and (monadic) effects and Z3
+       ;;gdscript                     ; the language you waited for
+       (go +lsp)                      ; the hipster dialect
+       (graphql +lsp)                 ; Give queries a REST
+       (haskell +lsp)                 ; a language that's lazier than I am
+       ;;hy                           ; readability of scheme w/ speed of python
+       ;;idris                        ; a language you can depend on
+       json                           ; At least it ain't XML
        (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
-       ;;julia             ; a better, faster MATLAB
-       (kotlin +lsp)            ; a better, slicker Java(Script)
-       ;;latex             ; writing papers in Emacs has never been so fun
-       ;;lean              ; for folks with too much to prove
-       ;;ledger            ; be audit you can be
-       (lua +lsp +fennel)       ; one-based indices? one-based indices
-       (markdown +grip)    ; writing docs for people to ignore
-       ;;nim               ; python + lisp at the speed of c
-       (nix +lsp +tree-sitter)  ; I hereby declare "nix geht mehr!"
-       ;;ocaml             ; an objective camel
+       ;;julia                        ; a better, faster MATLAB
+       ;;(kotlin +lsp)               ; a better, slicker Java(Script)
+       ;;latex                        ; writing papers in Emacs has never been so fun
+       ;;lean                         ; for folks with too much to prove
+       ;;ledger                       ; be audit you can be
+       (lua +lsp +fennel)             ; one-based indices? one-based indices
+       (markdown +grip)               ; writing docs for people to ignore
+       ;;nim                          ; python + lisp at the speed of c
+       (nix +tree-sitter)             ; I hereby declare "nix geht mehr!"
+       ;;ocaml                        ; an objective camel
        (org
         +dragndrop
         +gnuplot
+        +journal
         +jupyter
-        +noter
+        ;; +noter
         +pandoc
         +pomodoro
         +present
         +pretty
-        ;; +brain
-        ;; +hugo
-        ;; +roam2
-        ) ; organize your plain life in plain text
-       ;;php               ; perl's insecure younger brother
-       plantuml          ; diagrams for confusing people more
-       ;;purescript        ; javascript, but functional
-       (python +lsp +poetry +pyright +tree-sitter)     ; beautiful is better than ugly
-       ;;qt                ; the 'cutest' gui framework ever
-       ;;racket            ; a DSL for DSLs
-       ;;raku              ; the artist formerly known as perl6
-       ;;rest              ; Emacs as a REST client
-       ;;rst               ; ReST in peace
-       ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust +lsp +tree-sitter)  ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
-       ;;scala             ; java, but good
-       (scheme +guile)   ; a fully conniving family of lisps
-       (sh +lsp +tree-sitter) ; she sells {ba,z,fi}sh shells on the C xor
+        +roam2)
+       ;;php                                       ; perl's insecure younger brother
+       plantuml                                    ; diagrams for confusing people more
+       ;;purescript                                ; javascript, but functional
+       (python +lsp +poetry +pyright +tree-sitter) ; beautiful is better than ugly
+       ;;qt                                        ; the 'cutest' gui framework ever
+       ;;racket                                    ; a DSL for DSLs
+       ;;raku                                      ; the artist formerly known as perl6
+       ;;rest                                      ; Emacs as a REST client
+       ;;rst                                       ; ReST in peace
+       ;;(ruby +rails)                             ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       (rust +lsp +tree-sitter)                    ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;;scala                                     ; java, but good
+       (scheme +guile)                             ; a fully conniving family of lisps
+       (sh +lsp +tree-sitter)                      ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
-       ;;solidity          ; do you need a blockchain? No.
-       ;;swift             ; who asked for emoji variables?
-       ;;terra             ; Earth and Moon in alignment for performance.
-       (web +lsp +tree-sitter)               ; the tubes
-       (yaml +lsp +tree-sitter) ; JSON, bue readable
+       ;;solidity                 ; do you need a blockchain? No.
+       ;;swift                    ; who asked for emoji variables?
+       ;;terra                    ; Earth and Moon in alignment for performance.
+       (web +lsp +tree-sitter)    ; the tubes
+       (yaml +lsp +tree-sitter)   ; JSON, bue readable
        ;; (zig +lsp +tree-sitter) ; C, but simpler
 
        :email
@@ -210,17 +200,23 @@
        ;;(wanderlust +gmail)
 
        :app
-       calendar
-       ;; emms                       ; A media player for music no one's heard of
-       everywhere        ; *leave* Emacs!? You must be joking
-       ;;irc               ; how neckbeards socialize
-       (rss +org)        ; emacs as an RSS reader
-       ;;twitter           ; twitter client https://twitter.com/vnought
+       ;;calendar
+       everywhere
+       irc
+       ;;rss
+       ;;twitter
        (:if IS-LINUX openai)
 
        :config
        ;;literate
        (default +bindings +smartparens))
+
+
+;; For `vertico-multiform-mode' to work properly, it must be in control
+;; of when `vertico-posframe-mode' is enanbled, i.e. mutually exclusive minor modes.
+;; So, remove the hook configured here: https://github.com/doomemacs/doomemacs/blob/5155f4aa7880c265ff8ca0c2cde011d749e57223/modules/completion/vertico/config.el#L320
+;; (use-package-hook! vertico-posframe :post-init
+;;   (remove-hook! 'vertico-mode-hook #'vertico-posframe-mode))
 
 ;; (when init-file-debug
 ;;   (require 'benchmark-init)

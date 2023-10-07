@@ -2,14 +2,14 @@
 
 ;;;###autoload
 (defun +nix/switch-to-last-nix-buffer ()
-    (interactive)
-    (if-let* ((buf (seq-find (lambda (b)
-                               (with-current-buffer b
-                                 (and (derived-mode-p 'nix-mode)
-                                      (not (derived-mode-p 'nix-repl-mode)))))
-                             (buffer-list))))
-        (pop-to-buffer buf)
-      (switch-to-prev-buffer)))
+  (interactive)
+  (if-let* ((buf (seq-find (lambda (b)
+                             (with-current-buffer b
+                               (and (derived-mode-p 'nix-mode)
+                                    (not (derived-mode-p 'nix-repl-mode)))))
+                           (buffer-list))))
+      (pop-to-buffer buf)
+    (switch-to-prev-buffer)))
 
 ;;;###autoload
 (defun +nix/switch-to-repl-buffer ()
@@ -20,13 +20,12 @@
 ;;;###autoload
 (defun +nix/set-repl-file (&optional file)
   (interactive "Fnix repl file: ")
-  (setq nix-repl-executable-args `("repl" "--file" ,file))
-  (message (concat "Set nix-repl to use " file)))
+  (setq nix-repl-executable-args (list "repl" "--file" file)))
 
 ;;;###autoload
 (defun +nix/add-repl-expr (&optional expr)
   (interactive (read-string "Set Nix REPL expression: "))
-  (setq nix-repl-executable-args (append nix-repl-executable-args `("--expr" ,expr))))
+  (setq nix-repl-executable-args (append nix-repl-executable-args (list "--expr" expr))))
 
 ;;;###autoload
 (defun +nix/detect-repl-file ()

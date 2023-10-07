@@ -1,75 +1,30 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; ~/.doom.d/packages.el
 
-;; (package! benchmark-init)
-
-;;; :completion vertico
-;; NOTE: see other NOTE in init.el.
-(package! vertico-posframe
-  :recipe (:host github :repo "tumashu/vertico-posframe")
-  :pin "7da6d648ff4202a48eb6647ee7dce8d65de48779")
-
-;;; :editor evil
-;; (package! evil-string-inflection) ;; evil operator to cycle *-case in text objects
-
-;;; :tools magit
-;; (package! magit-delta)
-
-;;; :ui
-(package! button-lock)
-
-;;; :tools magit
-(package! gh-notify)
-
-;; ;;; :lang asciidoc
-;; (package! adoc-mode)
-
-;;; :lang lisp
 (package! aggressive-indent)
-(package! evil-cleverparens
-  :recipe (:host github :repo "emacs-evil/evil-cleverparens")
-  :pin "9ee249509281c387500e397df625ccb759804df4")
-(package! zprint-mode)
-(package! parseedn)
-(package! parseclj)
+(package! button-lock)
+(package! crux :recipe (:host github :repo "bbatsov/crux") :pin "f8789f67a9d2e1eb31a0e4531aec9bb6d6ec1282")
+(package! evil-cleverparens :recipe (:host github :repo "emacs-evil/evil-cleverparens") :pin "9ee249509281c387500e397df625ccb759804df4")
+(package! fence-edit :recipe (:host github :repo "aaronbieber/fence-edit.el") :pin "fab7cee16e91c2d8f9c24e2b08e934fa0813a774")
+(package! gh-notify)
+(package! graphviz-dot-mode :disable t)
 (package! highlight-parentheses)
-
-;;; :lang dot
-(package! graphviz-dot-mode)
-
-;;; :lang mermaid
-;; (package! mermaid-mode)
-;; (package! ob-mermaid)
-
-;;; :lang nix +lsp
-(package! nix-mode :pin "719feb7868fb567ecfe5578f6119892c771ac5e5") ;; (newer than doom module pin)
-
-;;; :lang protobuf
-(package! protobuf-mode)
-
-;;; :lang yuck
-(package! yuck-mode)
-
-;;; :lang just
 (package! just-mode)
 (package! justl)
-
-;;; :lang viml
-;; (package! vimrc-mode)
-
-;; https://emacs.stackexchange.com/questions/75827/doom-emacs-error-running-hook-global-git-commit-mode-because-void-variable
-;; (package! transient
-;;       :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
-;;       :recipe (:host github :repo "magit/transient"))
-;;
-;; (package! with-editor
-;;           :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
-;;           :recipe (:host github :repo "magit/with-editor"))
-
-;;; :lang v
-;; (package! v-mode)
-
-;;; :lang vala
-;; (package! vala-mode)
+(package! keycast)
+(package! kubel)
+(package! kubel-evil)
+(package! mermaid-mode)
+(package! minions)
+(package! ob-mermaid :disable t)
+(package! obsidian)
+(package! parseclj)
+(package! parseedn)
+(package! protobuf-mode :recipe (:host github :repo "protocolbuffers/protobuf" :files ("editors/protobuf-mode.el")) :pin "da38af71912b864141986577e36a9d055f2b22bc")
+(package! v-mode :disable t)
+(package! vala-mode :disable t)
+(package! vertico-posframe :recipe (:host github :repo "tumashu/vertico-posframe") :pin "7da6d648ff4202a48eb6647ee7dce8d65de48779")
+(package! yuck-mode)
+(package! zprint-mode)
 
 ;;; ~/.doom.d/packages.el ends here

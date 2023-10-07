@@ -90,42 +90,36 @@ Default value is `clojure-thread-all-but-last'."
   (interactive "P")
   (clojure--thread-all "cond->> " but-last))
 
-;; (defun +clojure-cycle-thread ()
-;;   (interactive)
-;;   (save-excursion
-;;     (ignore-errors (forward-char 7))
-;;     (search-backward-regexp "(\\(some\\|cond\\)?->")
-;;     (if (match-string 1)
-;;         (replace-match "" nil nil nil 1)
-;;       (goto-char (match-end 0))
-;;       (insert (if (or clojure-use-metadata-for-privacy
-;;                       (equal (match-string 0) "(def"))
-;;                   " ^:private"
-;;                 "-"))))
-;;   (ignore-errors
-;;     (when (looking-at "(")
-;;       (forward-char 1)
-;;       (forward-sexp 1)))
-;;   (search-backward-regexp "([^-]*->")
-;;   (down-list)
-;;   (when (clojure--threadable-p)
-;;     (prog1 (cond
-;;             ((looking-at "[^-]*->\\_>")  (clojure--thread-first))
-;;             ((looking-at "[^-]*->>\\_>") (clojure--thread-last)))
-;;       (clojure--fix-sexp-whitespace 'move-out)))
-;;   )
+;;;###autoload
+(defun +lsp-clojure-nrepl-connect ()
+  "Connect to the running nrepl debug server of clojure-lsp."
+  (interactive)
+  (let ((port (gethash "port" (lsp-request "clojure/serverInfo/raw" nil))))
+    (when (not (or (numberp  port) (and (stringp port) (string-match "[0-9]+" port))))
+      (user-error "Unable to determine clojure-lsp nREPL port. (port: %s)" port))
+    (cider-connect-clj `(:host "localhost" :port ,port))))
 
 ;;;###autoload
-(defun +clojure-lsp/register-remote-client (clojure-lsp-executable)
+(defun +lsp-clojure-workspace-restart-with-debug-cli ()
   (interactive)
-  (let ((clojure-lsp (or (executable-find "clojure-lsp")
-                         (user-error "Couldn't find clojure-lsp installed on your system"))))
-    (lsp-register-client
-     (make-lsp-client :new-connection (lsp-tramp-connection clojure-lsp)
-                      :major-modes '(clojure-mode)
-                      ;;:language-id "clojure"
-                      :remote? t
-                      :server-id 'clojure-lsp-remote))))
+  (when (not lsp-clojure-custom-server-command)
+    (let* ((clojure-lsp-src-dir (expand-file-name "~/src/github.com/clojure-lsp/clojure-lsp"))
+           (clojure-lsp-command (file-name-concat clojure-lsp-src-dir "clojure-lsp")))
+      (when (not (file-executable-p clojure-lsp-command))
+        (user-error "lsp-clojure-custom-server-command is not est and %s does not exist" clojure-lsp-command))
+      (setq lsp-clojure-custom-server-command (list clojure-lsp-command))
+      (print! "set lsp-clojure-custom-server-command: %s" lsp-clojure-custom-server-command)
+      (print! "restarting LSP workspace...")
+      (call-interactively #'lsp-workspace-restart))))
+
+;; (defun +clojure-lsp/register-remote-client (clojure-lsp-command)
+;;   (interactive (list (read-string "clojure-lsp command:" (executable-find "clojure-lsp"))))
+;;   (lsp-register-client
+;;    (make-lsp-client :new-connection (lsp-tramp-connection clojure-lsp)
+;;                     :major-modes '(clojure-mode)
+;;                     :language-id "clojure"
+;;                     :remote? t
+;;                     :server-id 'clojure-lsp-remote)))
 
 ;;;###autoload
 (defun +clojure/cursor-info ()
@@ -152,12 +146,21 @@ Default value is `clojure-thread-all-but-last'."
   (interactive)
   (let* ((definition (or (car (+clojure/cursor-definitions))
                          (user-error "Could find cursor definitions.")))
-         (namespace (or (gethash "ns" definition)
-                        (user-error "Definition does not have namespace")))
+         (namespace (gethash "ns" definition))
          (name (or (gethash "name" definition)
                    (user-error "Definition does not have name")))
-         (ref (concat namespace "/" name)))
+         (ref (if namespace (concat namespace "/" name) name)))
     (kill-new ref)
     (if (string= ref (car kill-ring))
         (message "Copied reference: %s" ref)
       (user-error "Couldn't copy reference in current buffer"))))
+
+;;;###autoload
+(defun +cider-doc-interactevely ()
+  "Like `cider-doc', but ignores symbol at point. Useful for looking up something specific"
+  (interactive)
+  (cider-ensure-connected)
+  (funcall (cider-prompt-for-symbol-function t)
+           "Doc for"
+           #'cider-doc-lookup)
+  (cider-complete-at-point))

@@ -56,12 +56,7 @@
     projectile-root-top-down-recurring))
 
 (after! cider
-  (when (modulep! :editor evil)
-    ;;(add-hook! 'cider-mode-hook (evil-collection-cider-setup))
-
-    ;; Disabling the following to make sure I really want it.
-    ;; (add-to-list 'evil-insert-state-modes 'cider-repl-mode)
-    )
+  (set-lookup-handlers! 'cider-mode :documentation #'cider-doc-lookup)
 
   (setq cider-prompt-for-symbol nil
         cider-save-file-on-load t
@@ -83,6 +78,7 @@
   (cider-add-to-alist 'cider-jack-in-dependencies "philoskim/debux" "0.8.2")
   (cider-add-to-alist 'cider-jack-in-dependencies "com.clojure-goes-fast/clj-java-decompiler" "0.3.3")
   (cider-add-to-alist 'cider-jack-in-dependencies "criterium" "0.4.6")
+  (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/schema" "1.4.1")
   (cider-add-to-alist 'cider-jack-in-dependencies "prismatic/plumbing" "0.6.0")
 
   ;; shortcuts menu 😎
