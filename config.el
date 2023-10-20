@@ -4,8 +4,16 @@
       user-mail-address "logan@loganlinn.com"
       fill-column 99
       display-line-numbers-type 'relative
-      delete-by-moving-to-trash t
       fancy-splash-image (concat doom-private-dir "splash.png"))
+
+(add-hook! 'doom-after-init-hook
+  (defun doom--end-init-h ()
+    "Set `doom-init-time'."
+    (when (doom-context-pop 'init)
+      (setq doom-init-time (float-time (time-subtract (current-time) before-init-time))))))
+;; Trash
+(setq delete-by-moving-to-trash t
+      trash-directory (cond (IS-MAC "") ))
 
 (setq doom-theme 'doom-one
       doom-one-padded-modeline nil
@@ -17,14 +25,13 @@
       doom-themes-treemacs-theme "doom-colors"
       doom-themes-treemacs-enable-variable-pitch nil)
 
-;; (add-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-;; (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-(add-to-list '+doom-dashboard-menu-sections
-             '("Open daily note"
-               :icon (nerd-icons-faicon "nf-fa-calendar" :face 'doom-dashboard-menu-title)
-               :when (featurep! :lang org +journal)
-               :face (:inherit (doom-dashboard-menu-title bold))
-               :action org-roam-dailies-goto-today))
+(when (modulep! :ui doom-dashboard)
+  (add-to-list '+doom-dashboard-menu-sections
+               '("Open daily note"
+                 :icon (nerd-icons-faicon "nf-fa-calendar" :face 'doom-dashboard-menu-title)
+                 :when (featurep! :lang org +journal)
+                 :face (:inherit (doom-dashboard-menu-title bold))
+                 :action org-roam-dailies-goto-today)))
 
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode t)
@@ -73,7 +80,11 @@
           :desc "Browse assigned requests" "a" (cmd! (browse-url "https://github.com/pulls/assigned"))
           :desc "Browse review requests"   "R" (cmd! (browse-url "https://github.com/pulls/review-requested"))
           :desc "Graphite dashboard"       "g" (cmd! (browse-url "https://app.graphite.dev/")))))
-      )
+
+      (:when (modulep! :ui workspaces)
+       (:prefix-map ("TAB" . "workspace")
+        :desc "Swap left"  "<" #'+workspace/swap-left
+        :desc "Swap right" ">" #'+workspace/swap-right)))
 
 (map! [mouse-8] #'switch-to-prev-buffer
       [mouse-9] #'switch-to-next-buffer
@@ -410,7 +421,7 @@
   (when (string-match "\\.zsh$" buffer-file-name)
     (sh-set-shell "zsh")))
 
-(defun ll/turn-on-lisp-modes ()
+(defun my/turn-on-lisp-modes ()
   (interactive)
   (rainbow-delimiters-mode 1)
   ;; does not respect :style/indent metadata...
@@ -448,7 +459,7 @@
             'scheme-mode-hook
             'yuck-mode-hook
             'janet-mode-hook)
-           :append #'ll/turn-on-lisp-modes)
+           :append #'my/turn-on-lisp-modes)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

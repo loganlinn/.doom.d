@@ -113,7 +113,7 @@
        tree-sitter
        terraform                     ; infrastructure as code
        ;;tmux                        ; an API for interacting with tmux
-       ;;upload                      ; map local to remote projects via ssh/ftp
+       upload                        ; map local to remote projects via ssh/ftp
        bpr
 
        :os
@@ -145,14 +145,14 @@
        ;;gdscript                     ; the language you waited for
        (go +lsp)                      ; the hipster dialect
        (graphql +lsp)                 ; Give queries a REST
-       (haskell +lsp)                 ; a language that's lazier than I am
+       ;; (haskell +lsp)                 ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
        ;;idris                        ; a language you can depend on
        json                           ; At least it ain't XML
        (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia                        ; a better, faster MATLAB
-       ;;(kotlin +lsp)               ; a better, slicker Java(Script)
+       (kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun
        ;;lean                         ; for folks with too much to prove
        ;;ledger                       ; be audit you can be
@@ -162,20 +162,28 @@
        (nix +lsp +tree-sitter)             ; I hereby declare "nix geht mehr!"
        ;;ocaml                        ; an objective camel
        (org
+        +contracts
+        +hugo ;; another markdown export
         +dragndrop
         +gnuplot
         +journal
         +jupyter
-        ;; +noter
+        +passwords ;; doom-package:org-passwords
         +pandoc
         +pomodoro
         +present
-        +pretty
+        +pretty ;; disable for better perf
         +roam2)
        ;;php                                       ; perl's insecure younger brother
        plantuml                                    ; diagrams for confusing people more
        ;;purescript                                ; javascript, but functional
-       (python +lsp +poetry +pyright +tree-sitter) ; beautiful is better than ugly
+       (python
+        ;; +conda
+        +cython
+        +lsp
+        +poetry
+        +pyright
+        +tree-sitter) ; beautiful is better than ugly
        ;;qt                                        ; the 'cutest' gui framework ever
        ;;racket                                    ; a DSL for DSLs
        ;;raku                                      ; the artist formerly known as perl6
@@ -202,7 +210,7 @@
        :app
        ;;calendar
        everywhere
-       irc
+       ;; irc
        ;;rss
        ;;twitter
        (:if IS-LINUX openai)

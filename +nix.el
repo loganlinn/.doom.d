@@ -37,5 +37,8 @@
         (setq-local nix-repl-executable-args (list "repl" "--file" repl-file))
         (print! "Configured nix-repl file: %s" repl-file)))))
 
+(after! lsp-nix
+  (setq lsp-nix-nil-formatter ["nixpkgs-fmt"]))
+
 (after! (:and evil nix-repl)
   (set-evil-initial-state! 'nix-repl-mode 'insert))
