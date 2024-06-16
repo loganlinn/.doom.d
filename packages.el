@@ -1,6 +1,10 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; ~/.doom.d/packages.el
 
+(package! doom-themes
+  :recipe (:host github :repo "loganlinn/doom-themes")
+  :pin "e47e604290ffe16b01e64c585d7c21c4b2a9d94a")
+
 (package! aggressive-indent)
 (package! button-lock)
 (package! crux :recipe (:host github :repo "bbatsov/crux") :pin "f8789f67a9d2e1eb31a0e4531aec9bb6d6ec1282")
