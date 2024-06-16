@@ -57,7 +57,8 @@
        zen               ; distraction-free coding or writing
 
        :editor
-       (evil +everywhere); come to the dark side, we have cookies
+       (:if IS-LINUX evil +everywhere); come to the dark side, we have cookies
+       (:unless IS-LINUX evil)
        file-templates    ; auto-snippets for empty files
        ;; fold              ; (nigh) universal code folding
        format            ; automated prettiness
@@ -100,7 +101,6 @@
        editorconfig                  ; let someone else argue about tabs vs spaces
        ;;ein                         ; tame Jupyter notebooks with emacs
        (eval +overlay)               ; run code, run (also, repls)
-       gist                          ; interacting with github gists
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
        lsp                           ; M-x vscode
        (magit +forge)                ; a git porcelain for Emacs
@@ -114,7 +114,6 @@
        terraform                     ; infrastructure as code
        ;;tmux                        ; an API for interacting with tmux
        upload                        ; map local to remote projects via ssh/ftp
-       bpr
 
        :os
        (:if IS-MAC macos)             ; improve compatibility with macOS
@@ -209,7 +208,7 @@
 
        :app
        ;;calendar
-       everywhere
+       (:if IS-LINUX everywhere)
        ;; irc
        ;;rss
        ;;twitter
