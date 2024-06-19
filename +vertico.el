@@ -1,9 +1,11 @@
 ;;; +vertico.el -*- lexical-binding: t; -*-
 
+
 (use-package! vertico-posframe
-  ;; NB: previously used `:after-call vertico', but try less eager:
-  :after vertico
+  :when (modulep! +childframe)
+  :after vertico ;; NB: previously used `:after-call vertico', but try less eager:
   :config
+
   ;; appearance
   (setq vertico-posframe-size-function #'vertico-posframe-get-size
         vertico-posframe-border-width 3
@@ -18,7 +20,7 @@
   (setq-hook! 'vertico-posframe-mode-hook
     vertico-posframe-fallback-mode 'vertico-buffer-mode))
 
-(after! vertico
+(after! vertico-posframe
   ;; Vertico Extensions: https://github.com/minad/vertico/tree/main#extensions
   (add-hook! 'vertico-mode-hook
              #'vertico-indexed-mode
