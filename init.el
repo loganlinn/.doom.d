@@ -16,6 +16,8 @@
 
 (setq byte-compile-warnings '(not obsolete))
 
+(defconst IS-WSL (and IS-LINUX (getenv "WSLENV")))
+
 ;; (if IS-MAC (setenv "LIBRARY_PATH" "/opt/homebrew/Cellar/gcc/13.1.0/bin:/opt/homebrew/Cellar/libgccjit/13.1.0/lib/gcc/current:/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/current/gcc/aarch64-apple-darwin22/13"))
 
 (doom! :input
@@ -57,8 +59,9 @@
        zen               ; distraction-free coding or writing
 
        :editor
-       (:if IS-LINUX evil +everywhere); come to the dark side, we have cookies
-       (:unless IS-LINUX evil)
+       (:cond (IS-WSL evil)
+              (IS-LINUX evil +everywhere)
+              (t evil))
        file-templates    ; auto-snippets for empty files
        ;; fold              ; (nigh) universal code folding
        format            ; automated prettiness
@@ -108,7 +111,6 @@
        (pass +auth)                  ; password manager for nerds
        pdf                           ; pdf enhancements
        prodigy                       ; FIXME managing external services & code builders
-       rgb                           ; creating color strings
        ;; taskrunner                 ; taskrunner for all your projects
        tree-sitter
        terraform                     ; infrastructure as code
@@ -192,7 +194,7 @@
        (rust +lsp +tree-sitter)                    ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala                                     ; java, but good
        ;;(scheme +guile)                           ; a fully conniving family of lisps
-       (sh +lsp +tree-sitter)                      ; she sells {ba,z,fi}sh shells on the C xor
+       (sh +lsp +tree-sitter +powershell)          ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity                 ; do you need a blockchain? No.
        ;;swift                    ; who asked for emoji variables?
