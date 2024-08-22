@@ -128,7 +128,11 @@
           ("zip"      . "clojure.zip"))))
 
 (after! projectile
-  (projectile-update-project-type 'clojure-cli :src-dir "src" :test-dir "test"))
+  (projectile-update-project-type 'clojure-cli :src-dir "src" :test-dir "test")
+  (add-to-list 'projectile-other-file-alist '("clj" . ("cljc" "cljs")))
+  (add-to-list 'projectile-other-file-alist '("cljs" . ("cljc" "clj")))
+  (add-to-list 'projectile-other-file-alist '("cljc" . ("clj" "cljs")))
+  (add-to-list 'projectile-other-file-alist '("edn" . ("clj"))))
 
 (load! "+clojure/clj-decompiler")
 (load! "+clojure/portal")

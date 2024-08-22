@@ -196,11 +196,16 @@
         projectile-current-project-on-switch 'move-to-end
         projectile-enable-caching nil
         ;; projectile-indexing-method 'hybrid ;; disabled due issues with files that exist not being reported
-        projectile-indexing-method 'alien)
-  (add-to-list 'projectile-other-file-alist '("clj" . ("cljc" "cljs")))
-  (add-to-list 'projectile-other-file-alist '("cljs" . ("cljc" "clj")))
-  (add-to-list 'projectile-other-file-alist '("cljc" . ("clj" "cljs")))
-  (add-to-list 'projectile-other-file-alist '("edn" . ("clj"))))
+        projectile-indexing-method 'alien))
+
+(after! (:and projectile treemacs)
+  (add-hook! 'projectile-before-switch-project-hook
+    (defun +treemacs--show-after-switch-project ()
+      (require 'treemacs)
+      (save-current-buffer
+       (pcase (treemacs-current-visibility)
+         ('exists  (treemacs-select-window))
+         ('none    (treemacs--init)))))))
 
 (after! (:and projectile centaur-tabs)
   (centaur-tabs-projectile-buffer-groups))
@@ -529,12 +534,18 @@
            :desc "Mark all items" "M" #'kubel-mark-all
            :desc "Unmark all items" "U" #'kubel-unmark-all)))))
 
+
 (use-package! kubel-evil
   :when (modulep! :editor evil)
   :hook (kubel-mode . kubel-evil-mode))
 
+
 (after! (:and kubel vterm)
   (kubel-vterm-setup))
+
+
+(use-package! powershell
+  :defer t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
