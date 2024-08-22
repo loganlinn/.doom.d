@@ -13,8 +13,6 @@
 (package! gh-notify)
 (package! graphviz-dot-mode :disable t)
 (package! highlight-parentheses)
-(package! just-mode)
-(package! justl)
 (package! keycast)
 (package! kubel)
 (package! kubel-evil)

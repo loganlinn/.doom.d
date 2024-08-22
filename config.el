@@ -544,8 +544,13 @@
   (kubel-vterm-setup))
 
 
-(use-package! powershell
-  :defer t)
+(use-package! powershell :defer t)
+
+
+(use-package! just-mode :defer t)
+
+
+(use-package! justl :defer t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
