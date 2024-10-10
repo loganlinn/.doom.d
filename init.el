@@ -18,7 +18,10 @@
 
 (defconst IS-WSL (and IS-LINUX (getenv "WSLENV")))
 
-;; (if IS-MAC (setenv "LIBRARY_PATH" "/opt/homebrew/Cellar/gcc/13.1.0/bin:/opt/homebrew/Cellar/libgccjit/13.1.0/lib/gcc/current:/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/current/gcc/aarch64-apple-darwin22/13"))
+;;;; per https://github.com/emacs-lsp/lsp-mode#performance
+(setenv "LSP_USE_PLISTS" "true")
+(setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
+(setq read-process-output-max (* 1024 1024)) ;; 1MB
 
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
@@ -75,7 +78,7 @@
        word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +ranger +icons)   ; making dired pretty [functional]
+       (dired +icons)   ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        (ibuffer +icons)         ; interactive buffer management
        undo              ; persistent, smarter undo for your inevitable mistakes
@@ -154,7 +157,7 @@
        (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia                        ; a better, faster MATLAB
-       (kotlin +lsp)               ; a better, slicker Java(Script)
+       ;; (kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun
        ;;lean                         ; for folks with too much to prove
        ;;ledger                       ; be audit you can be

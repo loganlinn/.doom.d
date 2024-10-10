@@ -560,5 +560,11 @@
 (load! "+crystal")
 (load! "+nix")
 (load! "+emacs-lisp")
+(load! "+org")
+
+(when IS-MAC (load! "+darwin"  nil t))
+(when IS-LINUX (load! "+linux"  nil t))
+(when IS-WINDOWS (load! "+windows"  nil t))
+
 (load! (concat "+systems/" (system-name)) nil t)
 (load! "+local" nil t)
