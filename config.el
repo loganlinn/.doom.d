@@ -418,7 +418,8 @@
 ;;; :lang
 
 (after! org
-  (setq org-directory (or (getenv "XDG_NOTES_DIR") "~/Sync/notes/")) ;; yes, trailing slash
+  (setq org-directory (or (getenv "XDG_ORG_DIR") "~/org/")) ;; yes, trailing slash
+  (setq org-default-notes-file (concat org-directory "refile.org"))
   (setq org-display-remote-inline-images t)
   (add-to-list 'org-modules 'ol-man))
 
