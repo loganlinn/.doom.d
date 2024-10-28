@@ -404,6 +404,9 @@
 (use-package! keycast
   :commands keycast-mode)
 
+(use-package! prisma-mode
+  :defer t)
+
 (use-package! protobuf-mode
   :defer t)
 

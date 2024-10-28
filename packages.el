@@ -24,6 +24,7 @@
 (package! outshine)
 (package! parseclj)
 (package! parseedn)
+(package! prisma-mode :recipe (:host github :repo "pimeys/emacs-prisma-mode" :branch "main"))
 (package! protobuf-mode :recipe (:host github :repo "protocolbuffers/protobuf" :files ("editors/protobuf-mode.el")) :pin "28e573e77fc3b453dd242e3848b19e7adbf04984")
 (package! v-mode :disable t)
 (package! vala-mode :disable t)
