@@ -1,4 +1,9 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+(add-hook! 'doom-after-init-hook
+  (defun doom--end-init-h ()
+    "Set `doom-init-time'."
+    (when (doom-context-pop 'init)
+      (setq doom-init-time (float-time (time-subtract (current-time) before-init-time))))))
 
 (setq user-full-name "Logan Linn"
       user-mail-address "logan@loganlinn.com"
@@ -6,12 +11,12 @@
       display-line-numbers-type 'relative
       fancy-splash-image (concat doom-private-dir "splash.png"))
 
-(add-hook! 'doom-after-init-hook
-  (defun doom--end-init-h ()
-    "Set `doom-init-time'."
-    (when (doom-context-pop 'init)
-      (setq doom-init-time (float-time (time-subtract (current-time) before-init-time))))))
-;; Trash
+;; macos: ⌘ instead of ⌥ for meta
+(setq mac-option-key-is-meta nil
+      mac-command-key-is-meta t
+      mac-command-modifier 'meta
+      mac-option-modifier 'none)
+
 (setq delete-by-moving-to-trash t
       trash-directory (cond (IS-MAC "") ))
 
@@ -175,7 +180,13 @@
         evil-cleverparens-move-skip-delimiters nil
         evil-cleverparens-complete-parens-in-yanked-region nil
         evil-want-fine-undo t
-        evil-move-beyond-eol t))
+        evil-move-beyond-eol t)
+
+  ;; (map! :map evil-cleverparens-map
+  ;;       :leader
+  ;;       "(" #'evil-cp-wrap-next-round
+  ;;       ")" #'evil-cp-wrap-previous-round)
+  )
 
 (use-package! highlight-parenthesis
   :defer t)
@@ -279,75 +290,6 @@
 (after! gist
   (setq gist-view-gist t))
 
-(after! lsp-mode
-  (setq lsp-log-io nil
-        lsp-file-watch-threshold 8264
-        lsp-enable-indentation t
-        lsp-enable-on-type-formatting t)
-
-  ;; completion
-  (setq ;; lsp-completion-enable t
-        ;; lsp-completion-enable-additional-text-edit
-        ;; lsp-completion-filter-on-incomplete
-        ;; lsp-completion-no-cache
-        ;; lsp-completion-provider
-        ;; lsp-completion-show-detail t
-        ;; lsp-completion-show-kind t
-        ;; lsp-completion-show-label-description
-        ;; lsp-completion-sort-initial-results
-        ;; lsp-completion-use-last-result
-        ;; lsp-enable-snippet t
-        )
-
-  ;; lens
-  (setq lsp-lens-enable t
-        lsp-lens-place-position  #'end-of-line)
-
-  ;; headerline
-  (setq lsp-headerline-breadcrumb-enable nil)
-
-  ;; modeline
-  (setq lsp-modeline-workspace-status-enable t
-        lsp-modeline-code-actions-enable t
-        lsp-modeline-diagnostics-enable nil
-        lsp-modeline-diagnostics-scope :file)
-
-  (dolist (dir '("[/\\\\]\\.ccls-cache\\'"
-                 "[/\\\\]\\.mypy_cache\\'"
-                 "[/\\\\]\\.pytest_cache\\'"
-                 "[/\\\\]\\.cache\\'"
-                 "[/\\\\]\\.clwb\\'"
-                 "[/\\\\]__pycache__\\'"
-                 "[/\\\\]\\.devenv\\'"
-                 "[/\\\\]\\.go\\'"
-                 "[/\\\\]\\.env\\'"
-                 "[/\\\\]\\.local\\'"
-                 "[/\\\\]bazel-bin\\'"
-                 "[/\\\\]bazel-code\\'"
-                 "[/\\\\]bazel-genfiles\\'"
-                 "[/\\\\]bazel-out\\'"
-                 "[/\\\\]bazel-testlogs\\'"
-                 "[/\\\\]third_party\\'"
-                 "[/\\\\]third-party\\'"
-                 "[/\\\\]buildtools\\'"
-                 "[/\\\\]out\\'"))
-    (push dir lsp-file-watch-ignored-directories)))
-
-(after! lsp-ui
-  (setq lsp-ui-doc-enable nil
-        lsp-ui-peek-enable nil
-        lsp-ui-doc-border (doom-color 'fg)
-        lsp-ui-doc-enable t
-        lsp-ui-doc-include-signature t
-        lsp-ui-doc-include-signature t
-        lsp-ui-doc-max-height 30
-        lsp-ui-doc-max-width 100
-        lsp-ui-sideline-enable nil
-        lsp-ui-sideline-ignore-duplicate t))
-
-(after! lsp-treemacs
-  (setq lsp-treemacs-error-list-current-project-only t))
-
 (use-package! aggressive-indent
   :commands aggressive-indent-mode aggressive-indent-global-mode
   :config
@@ -420,12 +362,6 @@
 
 ;;; :lang
 
-(after! org
-  (setq org-directory (or (getenv "XDG_ORG_DIR") "~/org/")) ;; yes, trailing slash
-  (setq org-default-notes-file (concat org-directory "refile.org"))
-  (setq org-display-remote-inline-images t)
-  (add-to-list 'org-modules 'ol-man))
-
 (add-hook! 'sh-mode-hook
   (when (string-match "\\.zsh$" buffer-file-name)
     (sh-set-shell "zsh")))
@@ -470,105 +406,21 @@
             'janet-mode-hook)
            :append #'my/turn-on-lisp-modes)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package! kubel
-  :commands
-  kubel
-  kubel-quick-edit
-  kubel-mode
-  kubel-yaml-editing-mode
-  kubel-get-resource-details
-  kubel-set-kubectl-config-file
-  kubel-set-context
-  kubel-set-namespace
-  kubel-set-resource
-  kubel-copy-popup
-  kubel-delete-popup
-  kubel-exec-popup
-  kubel-log-popup
-  kubel-port-forward-pod
-  :config
-
-  (set-popup-rules!
-    '(("^\\*kubel stderr" :size 0.25 :select nil :quit t :ttl 10)
-      ("^\\*kubel-process" :size 0.3 :select nil :quit 'current)
-      ("^\\*kubel - port-forward" :size 0.3 :select nil :quit 'current :ttl 0)
-      ("\\*kubel-drawer\\*" :slot 1 :side right :size 0.5 :select t :quit nil)
-      ("^\\*kubel " :ignore t)))
-
-(defun +kubel/show ()
-  (interactive)
-  (with-current-buffer (get-buffer-create " *kubel-drawer*")
-    (kubel-mode)
-    (+popup-buffer-mode 1)
-    (pop-to-buffer-same-window (current-buffer))))
-
-  (map! (:leader (:prefix-map ("o" . "open") "k" #'kubel))
-        (:localleader
-         (:map kubel-mode-map
-          :desc "Help Popup" "'" #'kubel-evil-help-popup
-          :desc "Port forward" "p" #'kubel-port-forward-pod
-          :desc "Logs" "l" #'kubel-log-popup
-          :desc "Exec" "e" #'kubel-exec-popup
-          :desc "Jab" "j" #'kubel-jab-deployment
-          :desc "Scale replicas" "S" #'kubel-scale-replicas
-          :desc "Copy to clipboad..." "c" #'kubel-copy-popup
-          :desc "Show Process buffer" "$" #'kubel-show-process-buffer
-          (:prefix ("a" . "action")
-           :desc "Resource details" "RET" #'kubel-describe-popup
-           :desc "Quick edit" "E" #'kubel-quick-edit
-           :desc "Refresh" "g" #'kubel
-           :desc "Delete" "k" #'kubel-delete-popup
-           :desc "Rollout" "r" #'kubel-rollout-history)
-          (:prefix ("s" . "settings")
-           :desc "Set context" "C" #'kubel-set-context
-           :desc "Set namespace" "n" #'kubel-set-namespace
-           :desc "Set resource" "R" #'kubel-set-resource
-           :desc "Set kubectl config file" "K" #'kubel-set-kubectl-config-file
-           :desc "Set output format" "F" #'kubel-set-output-format)
-          (:prefix ("f" . "filter")
-           :desc "Filter" "f" #'kubel-set-filter
-           :desc "Next highlight" "M-n" #'kubel-jump-to-next-highlight
-           :desc "Previous highlight" "M-p" #'kubel-jump-to-previous-highlight
-           :desc "Set label selector" "s" #'kubel-set-label-selector)
-          (:prefix ("m" . "marking")
-           :desc "Mark item" "m" #'kubel-mark-item
-           :desc "Unmark item" "u" #'kubel-unmark-item
-           :desc "Mark all items" "M" #'kubel-mark-all
-           :desc "Unmark all items" "U" #'kubel-unmark-all)))))
-
-
-(use-package! kubel-evil
-  :when (modulep! :editor evil)
-  :hook (kubel-mode . kubel-evil-mode))
-
-
-(after! (:and kubel vterm)
-  (kubel-vterm-setup))
-
-
 (use-package! powershell :defer t)
 
-
-(use-package! just-mode :defer t)
-
-
-(use-package! justl :defer t)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load! "+vertico")
 (load! "+clojure")
 (load! "+crystal")
-(load! "+nix")
 (load! "+emacs-lisp")
+(load! "+javascript")
+(load! "+kubernetes")
+(load! "+lsp")
+(load! "+nix")
 (load! "+org")
-
+(load! "+vertico")
 (when IS-MAC (load! "+darwin"  nil t))
 (when IS-LINUX (load! "+linux"  nil t))
 (when IS-WINDOWS (load! "+windows"  nil t))
-
 (load! (concat "+systems/" (system-name)) nil t)
 (load! "+local" nil t)

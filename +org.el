@@ -1,5 +1,10 @@
 ;;; +org.el -*- lexical-binding: t; -*-
 
+(after! org
+  (setq org-directory (or (getenv "XDG_NOTES_DIR") "~/Sync/notes/")) ;; yes, trailing slash
+  (setq org-display-remote-inline-images t)
+  (add-to-list 'org-modules 'ol-man))
+
 (defun +org/capture-code-snippet ()
   "Capture a code snippet and its file link to the daily org note."
   (interactive)

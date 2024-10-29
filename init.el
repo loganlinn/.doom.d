@@ -63,7 +63,8 @@
 
        :editor
        (:cond (IS-WSL evil)
-              (IS-LINUX evil +everywhere)
+              (IS-LINUX (evil +everywhere))
+              (IS-MAC (evil +everywhere))
               (t evil))
        file-templates    ; auto-snippets for empty files
        ;; fold              ; (nigh) universal code folding
@@ -108,7 +109,7 @@
        ;;ein                         ; tame Jupyter notebooks with emacs
        (eval +overlay)               ; run code, run (also, repls)
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
-       lsp                           ; M-x vscode
+       (lsp +peek)                           ; M-x vscode
        (magit +forge)                ; a git porcelain for Emacs
        make                          ; run make tasks from Emacs
        (pass +auth)                  ; password manager for nerds
@@ -155,7 +156,7 @@
        ;;idris                        ; a language you can depend on
        json                           ; At least it ain't XML
        (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
-       (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
+       (javascript +lsp) ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia                        ; a better, faster MATLAB
        ;; (kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun

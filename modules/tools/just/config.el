@@ -1,7 +1,7 @@
 ;;; tools/just/config.el -*- lexical-binding: t; -*-
 
 (use-package! just-mode
-  :mode ("/[Jj]ustfile\\'" . just-mode)
+  :defer t
   :config
   (set-formatter! 'just-fmt `(,just-executable "--dump") :modes '(just-mode))
   (map! :localleader
