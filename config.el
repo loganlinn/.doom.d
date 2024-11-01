@@ -25,8 +25,8 @@
       doom-one-brighter-modeline t
       doom-one-brighter-comments nil)
 
-(setq doom-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
-      doom-variable-pitch-font (font-spec :family "DejaVu Sans Mono" :weight 'normal :size 14)
+(setq doom-font (font-spec :family "Victor Mono" :weight 'normal :size 14)
+      doom-variable-pitch-font (font-spec :family "Victor Mono" :weight 'normal :size 14)
       doom-themes-treemacs-theme "doom-colors"
       doom-themes-treemacs-enable-variable-pitch nil)
 

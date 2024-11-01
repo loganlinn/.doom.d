@@ -8,6 +8,7 @@
 (package! aggressive-indent)
 (package! button-lock)
 (package! crux :recipe (:host github :repo "bbatsov/crux") :pin "f8789f67a9d2e1eb31a0e4531aec9bb6d6ec1282")
+(package! docker-compose-mode)
 (package! evil-cleverparens :recipe (:host github :repo "emacs-evil/evil-cleverparens") :pin "134fe3396f975fb1ad261f52cd113f42ac1da4fc")
 (package! fence-edit :recipe (:host github :repo "aaronbieber/fence-edit.el") :pin "fab7cee16e91c2d8f9c24e2b08e934fa0813a774")
 (package! gh-notify)
