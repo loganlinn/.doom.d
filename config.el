@@ -1,9 +1,4 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-(add-hook! 'doom-after-init-hook
-  (defun doom--end-init-h ()
-    "Set `doom-init-time'."
-    (when (doom-context-pop 'init)
-      (setq doom-init-time (float-time (time-subtract (current-time) before-init-time))))))
 
 (setq user-full-name "Logan Linn"
       user-mail-address "logan@loganlinn.com"
@@ -76,20 +71,20 @@
        :desc "Jump to symbol in any workspace"     "J"   #'consult-lsp-symbols)
 
       (:prefix-map ("g" . "git")
-       (:when (modulep! :tools magit)
-         ;; don't ask for file; use current (magit-stage-file behavior changed?)
-         :desc "Git stage diff"            "w"   #'magit-diff-staged
-         :desc "Git stage file"            "S"   (cmd!! #'magit-stage-buffer-file #'magit-staged-files)
-         :desc "Git unstage file"          "U"   (cmd!! #'magit-unstage-buffer-file #'magit-staged-files)
-         (:prefix ("o" . "open in browser")
-          :desc "Browse assigned requests" "a" (cmd! (browse-url "https://github.com/pulls/assigned"))
-          :desc "Browse review requests"   "R" (cmd! (browse-url "https://github.com/pulls/review-requested"))
-          :desc "Graphite dashboard"       "g" (cmd! (browse-url "https://app.graphite.dev/")))))
+                   (:when (modulep! :tools magit)
+                     ;; don't ask for file; use current (magit-stage-file behavior changed?)
+                     :desc "Git stage diff"            "w"   #'magit-diff-staged
+                     :desc "Git stage file"            "S"   (cmd!! #'magit-stage-buffer-file #'magit-staged-files)
+                     :desc "Git unstage file"          "U"   (cmd!! #'magit-unstage-buffer-file #'magit-staged-files)
+                     (:prefix ("o" . "open in browser")
+                      :desc "Browse assigned requests" "a" (cmd! (browse-url "https://github.com/pulls/assigned"))
+                      :desc "Browse review requests"   "R" (cmd! (browse-url "https://github.com/pulls/review-requested"))
+                      :desc "Graphite dashboard"       "g" (cmd! (browse-url "https://app.graphite.dev/")))))
 
       (:when (modulep! :ui workspaces)
-       (:prefix-map ("TAB" . "workspace")
-        :desc "Swap left"  "<" #'+workspace/swap-left
-        :desc "Swap right" ">" #'+workspace/swap-right)))
+        (:prefix-map ("TAB" . "workspace")
+         :desc "Swap left"  "<" #'+workspace/swap-left
+         :desc "Swap right" ">" #'+workspace/swap-right)))
 
 (map! [mouse-8] #'switch-to-prev-buffer
       [mouse-9] #'switch-to-next-buffer
@@ -153,6 +148,16 @@
   '(("^\\*\\([Hh]elp\\|Apropos\\)" :slot 2 :vslot -8 :size 0.42 :select t :quit 'current)
     ("^\\*Async Shell Command" :vslot -5 :select t :quit t :ttl 10)))
 
+;; (defun logalinn/switch-to-project-workspace (&optional project)
+;;   (interactive "P")
+;;   (let ((projects (projectile-relevant-known-projects)))
+;;     (if projects
+;;         (projectile-completing-read
+;;          "Switch to project: " projects
+;;          :action (lambda (project)
+;;                    (projectile-switch-project-by-name project arg)))
+;;       (user-error "There are no known projects"))))
+
 ;;; packages
 
 (use-package! evil-cleverparens
@@ -214,9 +219,9 @@
     (defun +treemacs--show-after-switch-project ()
       (require 'treemacs)
       (save-current-buffer
-       (pcase (treemacs-current-visibility)
-         ('exists  (treemacs-select-window))
-         ('none    (treemacs--init)))))))
+        (pcase (treemacs-current-visibility)
+          ('exists  (treemacs-select-window))
+          ('none    (treemacs--init)))))))
 
 (after! (:and projectile centaur-tabs)
   (centaur-tabs-projectile-buffer-groups))
@@ -252,12 +257,12 @@
 
   ;; https://github.com/tpope/vim-fugitive
   (when (modulep! :emacs vc)
-   (evil-ex-define-cmd "Gre ad" #'vc-revert)
-   (evil-ex-define-cmd "Gdiff" #'vc-diff)
-   (evil-ex-define-cmd "Ggrep`'" #'vc-git-grep)
-   (evil-ex-define-cmd "GMove" #'vc-rename-file)
-   (evil-ex-define-cmd "GDelete" #'vc-delete-file)
-   (evil-ex-define-cmd "GBrowse" #'+vc/browse-at-remote))
+    (evil-ex-define-cmd "Gre ad" #'vc-revert)
+    (evil-ex-define-cmd "Gdiff" #'vc-diff)
+    (evil-ex-define-cmd "Ggrep`'" #'vc-git-grep)
+    (evil-ex-define-cmd "GMove" #'vc-rename-file)
+    (evil-ex-define-cmd "GDelete" #'vc-delete-file)
+    (evil-ex-define-cmd "GBrowse" #'+vc/browse-at-remote))
 
   (when (modulep! :tools magit)
     (evil-ex-define-cmd "Gwrite" #'magit-stage-file)))
@@ -303,7 +308,7 @@
    "PAT-[0-9]+"
    (cmd! (let ((issue (buffer-substring (previous-single-property-change (point) 'mouse-face)
                                         (next-single-property-change (point) 'mouse-face))))
-          (browse-url (concat "https://linear.app/patch-tech/issue/" issue))))
+           (browse-url (concat "https://linear.app/patch-tech/issue/" issue))))
    :face             'link
    :face-policy      'prepend
    :keyboard-binding "RET"))
@@ -408,6 +413,49 @@
 
 (use-package! powershell :defer t)
 
+;; (use-package! codeium
+;;   :defer t
+;;   :init
+;;   ;; use globally
+;;   ;; (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
+;;   ;; or on a hook
+;;   ;; (add-hook 'python-mode-hook
+;;   ;;     (lambda ()
+;;   ;;         (setq-local completion-at-point-functions '(codeium-completion-at-point))))
+
+;;   ;; if you want multiple completion backends, use cape (https://github.com/minad/cape):
+;;   ;; (add-hook 'python-mode-hook
+;;   ;;     (lambda ()
+;;   ;;         (setq-local completion-at-point-functions
+;;   ;;             (list (cape-capf-super #'codeium-completion-at-point #'lsp-completion-at-point)))))
+;;   ;; an async company-backend is coming soon!
+
+;;   ;; codeium-completion-at-point is autoloaded, but you can
+;;   ;; optionally set a timer, which might speed up things as the
+;;   ;; codeium local language server takes ~0.2s to start up
+;;   ;; (add-hook 'emacs-startup-hook
+;;   ;;  (lambda () (run-with-timer 0.1 nil #'codeium-init)))
+
+;;   :config
+;;   ;; if you don't want to use customize to save the api-key
+;;   ;; (setq codeium/metadata/api_key "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+
+;;   ;; TODO configure modeline (the doom way)
+;;   ;; (setq codeium-mode-line-enable (lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
+;;   ;; (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t)
+
+;;   ;; use M-x codeium-diagnose to see apis/fields that would be sent to the local language server
+;;   ;; (setq codeium-api-enabled
+;;   ;;       (lambda (api)
+;;   ;;         (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
+
+;;   ;; you can also set a config for a single buffer like this:
+;;   ;; (add-hook 'python-mode-hook
+;;   ;;     (lambda ()
+;;   ;;         (setq-local codeium/editor_options/tab_size 4)))
+
+;;   )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load! "+clojure")
@@ -416,6 +464,7 @@
 (load! "+javascript")
 (load! "+kubernetes")
 (load! "+lsp")
+(load! "+lua")
 (load! "+nix")
 (load! "+org")
 (load! "+vertico")

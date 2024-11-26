@@ -19,9 +19,9 @@
 (defconst IS-WSL (and IS-LINUX (getenv "WSLENV")))
 
 ;;;; per https://github.com/emacs-lsp/lsp-mode#performance
-(setenv "LSP_USE_PLISTS" "true")
-(setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
-(setq read-process-output-max (* 1024 1024)) ;; 1MB
+;; (setenv "LSP_USE_PLISTS" "true")
+;; (setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
+;; (setq read-process-output-max (* 1024 1024)) ;; 1MB
 
 (doom! :input
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
@@ -30,23 +30,23 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company +childframe) ; the ultimate code completion backend
+       ;; (company +childframe) ; the ultimate code completion backend
+       (corfu +orderless +icons)  ; complete with cap(f), cape and a flying feather!
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-       (vertico +icons)
+       vertico
 
        :ui
        ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
        doom-dashboard    ; a nifty splash screen for Emacs
-       doom-quit         ; DOOM quit-message prompts when you quit Emacs
+       ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
        (emoji +unicode +github)  ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-       ;;hydra
        indent-guides     ; highlighted indent columns
-       ;; (ligatures +extra)  ; ligatures and symbols to make your code pretty again
-       minimap           ; show a map of the code on the side
+       ;;ligatures         ; ligatures and symbols to make your code pretty again
+       ;; minimap           ; show a map of the code on the side
        modeline          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
@@ -57,7 +57,7 @@
        unicode           ; extended unicode support for various languages
        (vc-gutter +pretty)         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
-       window-select     ; visually switch windows
+       ;; window-select     ; visually switch windows
        workspaces        ; tab emulation, persistence & separate workspaces
        zen               ; distraction-free coding or writing
 
@@ -67,8 +67,8 @@
               (IS-MAC (evil +everywhere))
               (t evil))
        file-templates    ; auto-snippets for empty files
-       ;; fold              ; (nigh) universal code folding
-       format            ; automated prettiness
+       fold              ; (nigh) universal code folding
+       (format +onsave)            ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        ;;multiple-cursors  ; editing in many places at once
@@ -81,6 +81,7 @@
        :emacs
        (dired +icons)   ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
+       ;;eww               ; the internet is gross
        (ibuffer +icons)         ; interactive buffer management
        undo              ; persistent, smarter undo for your inevitable mistakes
        vc                ; version-control and Emacs, sitting in a tree
@@ -101,7 +102,8 @@
 
        :tools
        ;;ansible
-       ;;biblio                      ; Writes a PhD for you (citation needed)
+       ;;biblio            ; Writes a PhD for you (citation needed)
+       ;;collab            ; buffers with friends
        ;;debugger                    ; FIXME stepping through code, to help you add bugs
        direnv
        docker
@@ -112,14 +114,15 @@
        (lsp +peek)                           ; M-x vscode
        (magit +forge)                ; a git porcelain for Emacs
        make                          ; run make tasks from Emacs
-       (pass +auth)                  ; password manager for nerds
+       ;; (pass +auth)                  ; password manager for nerds
        pdf                           ; pdf enhancements
        prodigy                       ; FIXME managing external services & code builders
-       ;; taskrunner                 ; taskrunner for all your projects
+       ;;tmux              ; an API for interacting with tmux
        tree-sitter
        terraform                     ; infrastructure as code
        ;;tmux                        ; an API for interacting with tmux
        upload                        ; map local to remote projects via ssh/ftp
+
        just
 
        :os
@@ -215,23 +218,11 @@
 
        :app
        ;;calendar
-       (:if IS-LINUX everywhere)
-       ;; irc
-       ;;rss
-       ;;twitter
+       (:if IS-LINUX everywhere) ; *leave* Emacs!? You must be joking
+       ;;irc               ; how neckbeards socialize
+       ;;(rss +org)        ; emacs as an RSS reader
        (:if IS-LINUX openai)
 
        :config
        ;;literate
        (default +bindings +smartparens))
-
-
-;; For `vertico-multiform-mode' to work properly, it must be in control
-;; of when `vertico-posframe-mode' is enanbled, i.e. mutually exclusive minor modes.
-;; So, remove the hook configured here: https://github.com/doomemacs/doomemacs/blob/5155f4aa7880c265ff8ca0c2cde011d749e57223/modules/completion/vertico/config.el#L320
-;; (use-package-hook! vertico-posframe :post-init
-;;   (remove-hook! 'vertico-mode-hook #'vertico-posframe-mode))
-
-;; (when init-file-debug
-;;   (require 'benchmark-init)
-;;   (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
