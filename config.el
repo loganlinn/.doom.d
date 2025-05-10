@@ -146,7 +146,8 @@
 (set-popup-rules!
   ;;  `help-mode', `helpful-mode' (same as default, excl :quit)
   '(("^\\*\\([Hh]elp\\|Apropos\\)" :slot 2 :vslot -8 :size 0.42 :select t :quit 'current)
-    ("^\\*Async Shell Command" :vslot -5 :select t :quit t :ttl 10)))
+    ("^\\*Async Shell Command" :vslot -5 :select t :quit t :ttl 10)
+    ("^\\*Python*" :size 0.25 :vslot -4 :select t :quit nil :ttl 0)))
 
 ;; (defun logalinn/switch-to-project-workspace (&optional project)
 ;;   (interactive "P")
@@ -249,6 +250,10 @@
   ;; Focus new window after splitting
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
+
+
+  ;; escape hatch
+  (define-key evil-emacs-state-map (kbd "Esc") 'evil-normal-state)
 
   ;; thicc finger support
   (evil-ex-define-cmd "W" #'evil-write)

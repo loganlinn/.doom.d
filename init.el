@@ -23,7 +23,7 @@
 ;; (setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
 ;; (setq read-process-output-max (* 1024 1024)) ;; 1MB
 
-(doom! :input
+(doom! :inputinit
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
        ;;japanese
@@ -52,6 +52,7 @@
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
+       ;;smooth-scroll     ; So smooth you won't believe it's not butter
        tabs              ; a tab bar for Emacs
        (treemacs +lsp)          ; a project drawer, like neotree but cooler
        unicode           ; extended unicode support for various languages
@@ -94,13 +95,14 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       (spell              ; tasing you for misspelling mispelling
+       (spell              ; tasing you for misspelling misspelling
         +flyspell
         ;; +aspell
         +hunspell)
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
+       llm
        ;;ansible
        ;;biblio            ; Writes a PhD for you (citation needed)
        ;;collab            ; buffers with friends
@@ -108,7 +110,7 @@
        direnv
        docker
        editorconfig                  ; let someone else argue about tabs vs spaces
-       ;;ein                         ; tame Jupyter notebooks with emacs
+       ;;in                         ; tame Jupyter notebooks with emacs
        (eval +overlay)               ; run code, run (also, repls)
        (lookup +dictionary +offline) ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
        (lsp +peek)                           ; M-x vscode
@@ -157,9 +159,10 @@
        ;; (haskell +lsp)                 ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
        ;;idris                        ; a language you can depend on
-       json                           ; At least it ain't XML
+       ;;janet                        ; Fun fact: Janet is me!
        (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp) ; all(hope(abandon(ye(who(enter(here))))))
+       json                           ; At least it ain't XML
        ;;julia                        ; a better, faster MATLAB
        ;; (kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun
@@ -172,7 +175,7 @@
        ;;ocaml                        ; an objective camel
        (org
         +contracts
-        +hugo ;; another markdown export
+        +hugo
         +dragndrop
         +gnuplot
         +journal
@@ -181,18 +184,18 @@
         +pandoc
         +pomodoro
         +present
-        +pretty ;; disable for better perf
+        +pretty    ;; disable for better perf
         +roam2)
-       ;;php                                       ; perl's insecure younger brother
-       plantuml                                    ; diagrams for confusing people more
-       ;;purescript                                ; javascript, but functional
+       ;;php                           ; perl's insecure younger brother
+       plantuml                        ; diagrams for confusing people more
+       ;;graphviz                      ; diagrams for confusing yourself even more
+       ;;purescript                    ; javascript, but functional
        (python
-        ;; +conda
         +cython
         +lsp
         +poetry
         +pyright
-        +tree-sitter) ; beautiful is better than ugly
+        +tree-sitter)
        ;;qt                                        ; the 'cutest' gui framework ever
        ;;racket                                    ; a DSL for DSLs
        ;;raku                                      ; the artist formerly known as perl6

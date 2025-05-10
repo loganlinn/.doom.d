@@ -27,10 +27,10 @@ The package directory is determined by locating the nearest package.json file."
 ;; configure lsp-eslint because the self-install is unreliable
 ;; run: npm install -g vscode-langservers-extracted
 (when (modulep! +lsp)
-  ;; TODO
-  ;; (when-let ((exe (executable-find "vscode-eslint-language-server")))
-  ;;   (setq lsp-eslint-server-command  '(,exe "--stdio")))
-  (setq lsp-eslint-server-command '("vscode-eslint-language-server" "--stdio")))
+  (after! lsp-javascript
+    (add-to-list 'exec-path (expand-file-name "~/.local/share/fnm/aliases/default/bin")))
+
+  (setq lsp-eslint-server-command '("npx" "vscode-eslint-language-server" "--stdio")))
 
 (map! :after typescript-mode
       :map typescript-mode-map
