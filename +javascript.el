@@ -1,5 +1,7 @@
 ;;; +javascript.el -*- lexical-binding: t; -*-
 
+(use-package! fnm :defer t)
+
 (defun +javascript/locate-package-json ()
   "Find the closest package.json file by traversing up the directory tree."
   (when-let (package-json (projectile-locate-dominating-file default-directory "package.json"))
@@ -26,10 +28,7 @@ The package directory is determined by locating the nearest package.json file."
 
 ;; configure lsp-eslint because the self-install is unreliable
 ;; run: npm install -g vscode-langservers-extracted
-(when (modulep! +lsp)
-  (after! lsp-javascript
-    (add-to-list 'exec-path (expand-file-name "~/.local/share/fnm/aliases/default/bin")))
-
+(after! lsp-mode
   (setq lsp-eslint-server-command '("npx" "vscode-eslint-language-server" "--stdio")))
 
 (map! :after typescript-mode

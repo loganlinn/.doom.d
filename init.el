@@ -108,7 +108,7 @@
        ;;collab            ; buffers with friends
        ;;debugger                    ; FIXME stepping through code, to help you add bugs
        direnv
-       docker
+       (docker +lsp)
        editorconfig                  ; let someone else argue about tabs vs spaces
        ;;in                         ; tame Jupyter notebooks with emacs
        (eval +overlay)               ; run code, run (also, repls)
@@ -116,14 +116,13 @@
        (lsp +peek)                           ; M-x vscode
        (magit +forge)                ; a git porcelain for Emacs
        make                          ; run make tasks from Emacs
-       ;; (pass +auth)                  ; password manager for nerds
+       (pass +auth)                  ; password manager for nerds
        pdf                           ; pdf enhancements
-       prodigy                       ; FIXME managing external services & code builders
-       ;;tmux              ; an API for interacting with tmux
-       tree-sitter
-       terraform                     ; infrastructure as code
+       ;;prodigy                       ; FIXME managing external services & code builders
        ;;tmux                        ; an API for interacting with tmux
-       upload                        ; map local to remote projects via ssh/ftp
+       tree-sitter
+       (terraform +lsp)              ; infrastructure as code
+       ;;upload                        ; map local to remote projects via ssh/ftp
 
        just
 
@@ -156,15 +155,15 @@
        ;;gdscript                     ; the language you waited for
        (go +lsp)                      ; the hipster dialect
        (graphql +lsp)                 ; Give queries a REST
-       ;; (haskell +lsp)                 ; a language that's lazier than I am
+       ;;(haskell +lsp)                 ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
        ;;idris                        ; a language you can depend on
        ;;janet                        ; Fun fact: Janet is me!
-       (java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
+       ;;(java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
        (javascript +lsp) ; all(hope(abandon(ye(who(enter(here))))))
        json                           ; At least it ain't XML
        ;;julia                        ; a better, faster MATLAB
-       ;; (kotlin +lsp)               ; a better, slicker Java(Script)
+       ;;(kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun
        ;;lean                         ; for folks with too much to prove
        ;;ledger                       ; be audit you can be
@@ -174,15 +173,15 @@
        (nix +lsp +tree-sitter)             ; I hereby declare "nix geht mehr!"
        ;;ocaml                        ; an objective camel
        (org
-        +contracts
+        ;; +contracts
         +hugo
         +dragndrop
         +gnuplot
-        +journal
-        +jupyter
+        ;; +journal
+        ;; +jupyter
         +passwords ;; doom-package:org-passwords
         +pandoc
-        +pomodoro
+        ;; +pomodoro
         +present
         +pretty    ;; disable for better perf
         +roam2)
@@ -195,6 +194,7 @@
         +lsp
         +poetry
         +pyright
+        +pyenv
         +tree-sitter)
        ;;qt                                        ; the 'cutest' gui framework ever
        ;;racket                                    ; a DSL for DSLs
@@ -212,7 +212,7 @@
        ;;terra                    ; Earth and Moon in alignment for performance.
        (web +lsp +tree-sitter)    ; the tubes
        (yaml +lsp +tree-sitter)   ; JSON, bue readable
-       ;; (zig +lsp +tree-sitter) ; C, but simpler
+       ;;(zig +lsp +tree-sitter) ; C, but simpler
 
        :email
        ;;(mu4e +org +gmail)
