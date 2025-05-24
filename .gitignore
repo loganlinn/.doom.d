@@ -1,5 +1,6 @@
+*.elc
++local.el
+.direnv/
+custom.el
 eshell/history
 eshell/lastdir
-*.elc
-custom.el
-+local.el
