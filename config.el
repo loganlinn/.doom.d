@@ -461,6 +461,8 @@
 
 ;;   )
 
+(use-package! fnm :defer t) ;; moved out of +javascript because things like +llm use it to install lsp servers
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (load! "+kubernetes")
 

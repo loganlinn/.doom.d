@@ -158,10 +158,10 @@
        ;;(haskell +lsp)                 ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
        ;;idris                        ; a language you can depend on
-       ;;janet                        ; Fun fact: Janet is me!
+       janet                        ; Fun fact: Janet is me!
        ;;(java +lsp +tree-sitter)       ; the poster child for carpal tunnel syndrome
-       (javascript +lsp) ; all(hope(abandon(ye(who(enter(here))))))
-       json                           ; At least it ain't XML
+       (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
+       (json +lsp +tree-sitter)                           ; At least it ain't XML
        ;;julia                        ; a better, faster MATLAB
        ;;(kotlin +lsp)               ; a better, slicker Java(Script)
        ;;latex                        ; writing papers in Emacs has never been so fun
@@ -173,18 +173,22 @@
        (nix +lsp +tree-sitter)             ; I hereby declare "nix geht mehr!"
        ;;ocaml                        ; an objective camel
        (org
-        ;; +contracts
-        +hugo
+        +contacts
+        +crypt
         +dragndrop
         +gnuplot
-        ;; +journal
-        ;; +jupyter
-        +passwords ;; doom-package:org-passwords
+        +hugo
+        +journal
         +pandoc
-        ;; +pomodoro
+        +passwords
+        +pomodoro
         +present
-        +pretty    ;; disable for better perf
-        +roam2)
+        +pretty
+        +roam2
+        ;; +brain
+        ;; +jupyter
+        ;; +noter
+        )
        ;;php                           ; perl's insecure younger brother
        plantuml                        ; diagrams for confusing people more
        ;;graphviz                      ; diagrams for confusing yourself even more
@@ -199,7 +203,7 @@
        ;;qt                                        ; the 'cutest' gui framework ever
        ;;racket                                    ; a DSL for DSLs
        ;;raku                                      ; the artist formerly known as perl6
-       ;;rest                                      ; Emacs as a REST client
+       (rest +jq)                                  ; Emacs as a REST client
        ;;rst                                       ; ReST in peace
        ;;(ruby +rails)                             ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        (rust +lsp +tree-sitter)                    ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
@@ -223,7 +227,7 @@
        ;;calendar
        (:if IS-LINUX everywhere) ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize
-       ;;(rss +org)        ; emacs as an RSS reader
+       (rss +org +youtube)        ; emacs as an RSS reader
        (:if IS-LINUX openai)
 
        :config

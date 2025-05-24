@@ -1,7 +1,5 @@
 ;;; +javascript.el -*- lexical-binding: t; -*-
 
-(use-package! fnm :defer t)
-
 (defun +javascript/locate-package-json ()
   "Find the closest package.json file by traversing up the directory tree."
   (when-let (package-json (projectile-locate-dominating-file default-directory "package.json"))
@@ -42,3 +40,29 @@ The package directory is determined by locating the nearest package.json file."
       :map typescript-mode-map
       :localleader
       "e" #'lsp-eslint-apply-all-fixes)
+
+(after! projectile
+  ;; Consider directories with these files as project roots, even in a monorepo
+  (setq projectile-project-root-files (append '("package.json") projectile-project-root-files)
+        projectile-project-root-files-bottom-up
+        (append '("package.json" "tsconfig.json")
+                projectile-project-root-files-bottom-up)))
+
+;; Configure LSP to detect project roots in monorepo subdirectories
+(after! lsp-mode
+  (setq lsp-auto-guess-root t)  ;; Attempt to guess the project root
+  ;; You can also set a custom root directory detection function
+  (setq lsp-before-initialize-hook
+        (lambda ()
+          (when (and buffer-file-name
+                     (or (locate-dominating-file buffer-file-name "tsconfig.json")
+                         (locate-dominating-file buffer-file-name "package.json")))
+            (setq-local lsp-workspace-root
+                        (or (locate-dominating-file buffer-file-name "tsconfig.json")
+                            (locate-dominating-file buffer-file-name "package.json")))))))
+
+(setq-hook! typescript-mode
+  projectile-project-root-functions
+  '(projectile-root-local
+    projectile-root-top-down
+    projectile-root-top-down-recurring))
