@@ -163,9 +163,11 @@
 
 (use-package! evil-cleverparens
   :after evil smartparens
+
   :init
   ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
   (setq evil-cleverparens-use-additional-bindings nil)
+
   :config
   ;; When using terminal emacs, remap M-[ and M-], to M-b and M-B, respectively
   (unless window-system
@@ -208,7 +210,7 @@
 
 (after! projectile
   (setq projectile-create-missing-test-files t
-        projectile-project-search-path '(("~/src" . 3))
+        projectile-project-search-path '(("~/src" . 3)) ; ~/src/github.com/owner/repo
         projectile-sort-order 'recently-active ;; recently active buffers and recently opened files
         projectile-current-project-on-switch 'move-to-end
         projectile-enable-caching nil
@@ -230,7 +232,7 @@
 (after! forge
   (setq  forge-topic-list-limit '(100 . -10)
          forge-owned-accounts '(("loganlinn"
-                                 "patch-tech"
+                                 "gamma-app"
                                  "plumatic"
                                  "omcljs"))))
 
@@ -262,7 +264,7 @@
 
   ;; https://github.com/tpope/vim-fugitive
   (when (modulep! :emacs vc)
-    (evil-ex-define-cmd "Gre ad" #'vc-revert)
+    (evil-ex-define-cmd "Gread" #'vc-revert)
     (evil-ex-define-cmd "Gdiff" #'vc-diff)
     (evil-ex-define-cmd "Ggrep`'" #'vc-git-grep)
     (evil-ex-define-cmd "GMove" #'vc-rename-file)
@@ -306,69 +308,48 @@
   ;; (setq aggressive-indent-region-function #'+format/region)
   (setq aggressive-indent-region-function #'indent-region))
 
-(use-package! button-lock
-  :defer t
-  :config
-  (button-lock-set-button
-   "PAT-[0-9]+"
-   (cmd! (let ((issue (buffer-substring (previous-single-property-change (point) 'mouse-face)
-                                        (next-single-property-change (point) 'mouse-face))))
-           (browse-url (concat "https://linear.app/patch-tech/issue/" issue))))
-   :face             'link
-   :face-policy      'prepend
-   :keyboard-binding "RET"))
-
 (use-package! crux
-  :commands
-  crux-open-with
-  crux-smart-kill-line
-  crux-smart-open-line-above
-  crux-smart-open-line
-  crux-cleanup-buffer-or-region
-  crux-recentf-find-file
-  crux-recentf-find-directory
-  crux-view-url
-  crux-eval-and-replace
-  crux-transpose-windows
-  crux-delete-file-and-buffer
-  crux-copy-file-preserve-attributes
-  crux-duplicate-current-line-or-region
-  crux-duplicate-and-comment-current-line-or-region
-  crux-rename-file-and-buffer
-  crux-visit-term-buffer
-  crux-kill-other-buffers
-  crux-indent-defun
-  crux-indent-rigidly-and-copy-to-clipboard
-  crux-find-user-init-file
-  crux-find-user-custom-file
-  crux-find-shell-init-file
-  crux-top-join-line
-  crux-kill-whole-line
-  crux-kill-line-backwards
-  crux-kill-and-join-forward
-  crux-kill-buffer-truename
-  crux-ispell-word-then-abbrev
-  crux-upcase-region
-  crux-downcase-region
-  crux-capitalize-region
-  crux-other-window-or-switch-buffer)
+  :commands (crux-open-with
+             crux-smart-kill-line
+             crux-smart-open-line-above
+             crux-smart-open-line
+             crux-cleanup-buffer-or-region
+             crux-recentf-find-file
+             crux-recentf-find-directory
+             crux-view-url
+             crux-eval-and-replace
+             crux-transpose-windows
+             crux-delete-file-and-buffer
+             crux-copy-file-preserve-attributes
+             crux-duplicate-current-line-or-region
+             crux-duplicate-and-comment-current-line-or-region
+             crux-rename-file-and-buffer
+             crux-visit-term-buffer
+             crux-kill-other-buffers
+             crux-indent-defun
+             crux-indent-rigidly-and-copy-to-clipboard
+             crux-find-user-init-file
+             crux-find-user-custom-file
+             crux-find-shell-init-file
+             crux-top-join-line
+             crux-kill-whole-line
+             crux-kill-line-backwards
+             crux-kill-and-join-forward
+             crux-kill-buffer-truename
+             crux-ispell-word-then-abbrev
+             crux-upcase-region
+             crux-downcase-region
+             crux-capitalize-region
+             crux-other-window-or-switch-buffer))
 
 (use-package! keycast
-  :commands keycast-mode)
+  :commands (keycast-mode))
 
 (use-package! prisma-mode
   :defer t)
 
 (use-package! protobuf-mode
   :defer t)
-
-(use-package! yuck-mode
-  :defer t)
-
-;; (use-package! minions
-;;   :defer t
-;;   :config
-;;   (map! "<S-down-mouse-3>" #'minions-minor-modes-menu))
 
 ;;; :lang
 
@@ -418,53 +399,7 @@
 
 (use-package! powershell :defer t)
 
-;; (use-package! codeium
-;;   :defer t
-;;   :init
-;;   ;; use globally
-;;   ;; (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
-;;   ;; or on a hook
-;;   ;; (add-hook 'python-mode-hook
-;;   ;;     (lambda ()
-;;   ;;         (setq-local completion-at-point-functions '(codeium-completion-at-point))))
-
-;;   ;; if you want multiple completion backends, use cape (https://github.com/minad/cape):
-;;   ;; (add-hook 'python-mode-hook
-;;   ;;     (lambda ()
-;;   ;;         (setq-local completion-at-point-functions
-;;   ;;             (list (cape-capf-super #'codeium-completion-at-point #'lsp-completion-at-point)))))
-;;   ;; an async company-backend is coming soon!
-
-;;   ;; codeium-completion-at-point is autoloaded, but you can
-;;   ;; optionally set a timer, which might speed up things as the
-;;   ;; codeium local language server takes ~0.2s to start up
-;;   ;; (add-hook 'emacs-startup-hook
-;;   ;;  (lambda () (run-with-timer 0.1 nil #'codeium-init)))
-
-;;   :config
-;;   ;; if you don't want to use customize to save the api-key
-;;   ;; (setq codeium/metadata/api_key "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
-
-;;   ;; TODO configure modeline (the doom way)
-;;   ;; (setq codeium-mode-line-enable (lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
-;;   ;; (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t)
-
-;;   ;; use M-x codeium-diagnose to see apis/fields that would be sent to the local language server
-;;   ;; (setq codeium-api-enabled
-;;   ;;       (lambda (api)
-;;   ;;         (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
-
-;;   ;; you can also set a config for a single buffer like this:
-;;   ;; (add-hook 'python-mode-hook
-;;   ;;     (lambda ()
-;;   ;;         (setq-local codeium/editor_options/tab_size 4)))
-
-;;   )
-
-(use-package! fnm :defer t) ;; moved out of +javascript because things like +llm use it to install lsp servers
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (load! "+kubernetes")
 
 (when (modulep! :completion vertico) (load! "+vertico"))
 (when (modulep! :lang clojure) (load! "+clojure"))
