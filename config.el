@@ -49,6 +49,11 @@
                 ("gmail" "https://mail.google.com/mail/u/0/#search/%s")
                 ("fastmail" "https://app.fastmail.com/mail/search:%s"))))
 
+;; `doom sync` produced error when deft module was loaded
+;; (after! deft
+;;   (setq deft-directory (expand-file-name (or (getenv-internal "XDG_NOTES_DIR") "~/Notes"))
+;;         deft-default-extension "md"))
+
 (map! :leader
       (:prefix-map ("b" . "buffer")
        :desc "Kill buffer everywhere"     "k" #'doom/kill-this-buffer-in-all-windows
@@ -61,7 +66,8 @@
        :desc "chmod"                      "M" #'chmod-this-file
        :desc "ranger"                     "g" #'ranger)
 
-      (:prefix-map ("q" . "quit/session")
+      (:after evil
+       :prefix-map ("q" . "quit/session")
        :desc "Quit Emacs without saving"  "!" #'evil-quit-all-with-error-code)
 
       (:prefix-map ("c" . "code")
@@ -86,62 +92,60 @@
          :desc "Swap left"  "<" #'+workspace/swap-left
          :desc "Swap right" ">" #'+workspace/swap-right)))
 
+(map! :after evil
+      (:map view-mode-map ; i.e. read-only files
+       :n "0" #'evil-beginning-of-line)
+
+      (:map prog-mode-map ; unwanted in term modes
+       :nv "C-a" #'evil-numbers/inc-at-pt
+       :nv "C-S-a" #'evil-numbers/dec-at-pt)
+
+      :nv :desc "next tab" [S-l] #'+tabs:next-or-goto
+      :nv :desc "previous tab" [S-h] #'+tabs:previous-or-goto)
+
+(map! :after company
+      :map company-active-map
+      [prior] #'company-previous-page
+      [next] #'company-page-next)
+
 (map! [mouse-8] #'switch-to-prev-buffer
       [mouse-9] #'switch-to-next-buffer
       [f12]     #'+lookup/definition
       [S-f12]   #'+lookup/references
-      [C-f12]   #'+lookup/implementations
+      [C-f12]   #'+lookup/implementations)
 
-      (:after expand-region
-       :nvi :desc "Expand region" "M-=" #'er/expand-region
-       :nvi :desc "Reverse expand region" "M--" (cmd! (er/expand-region -1)))
+(map! :after vertico
+      :map vertico-map
+      :desc "Quick insert" [M-q] #'vertico-quick-insert
+      :desc "Quick exit" [C-q] #'vertico-quick-exit
+      ;; vertico-exit completes with first suggestion, while
+      ;; vertico-exit-input completes with current input.
+      ;; This distinction is needed when, for example, an existing file is being renamed.
+      :desc "Exit with input" [M-return] #'vertico-exit-input)
 
-      (:after evil
-       :map prog-mode-map ; unwanted in term modes
-       :nv "C-a" #'evil-numbers/inc-at-pt
-       :nv "C-S-a" #'evil-numbers/dec-at-pt)
+(map! :after projectile
+      :leader
+      :prefix-map ("p" . "project")
+      :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test)
 
-      (:after evil
-       :map view-mode-map ; i.e. read-only files
-       :n "0" #'evil-beginning-of-line)
+(map! :after treemacs
+      :map treemacs-mode-map
+      :desc "Expand" [mouse-1] #'treemacs-single-click-expand-action
+      :desc "Rename file" [f2] #'treemacs-rename-file
+      :desc "Refresh" [f5] #'treemacs-refresh)
 
-      (:after company
-       :map company-active-map
-       [prior] #'company-previous-page
-       [next] #'company-page-next)
+(map! :after flycheck
+      :map flycheck-mode-map
+      :desc "Jump to next error" [f2]   #'flycheck-next-error
+      :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
 
-      (:after vertico
-       :map vertico-map
-       :desc "Quick insert" [M-q] #'vertico-quick-insert
-       :desc "Quick exit" [C-q] #'vertico-quick-exit
-       ;; vertico-exit completes with first suggestion, while
-       ;; vertico-exit-input completes with current input.
-       ;; This distinction is needed when, for example, an existing file is being renamed.
-       :desc "Exit with input" [M-return] #'vertico-exit-input)
-
-      (:after projectile
-       :leader
-       :prefix-map ("p" . "project")
-       :desc "Toggle impl/test" "A" #'projectile-toggle-between-implementation-and-test)
-
-      (:after treemacs
-       :map treemacs-mode-map
-       :desc "Expand" [mouse-1] #'treemacs-single-click-expand-action
-       :desc "Rename file" [f2] #'treemacs-rename-file
-       :desc "Refresh" [f5] #'treemacs-refresh)
-
-      (:after flycheck
-       :map flycheck-mode-map
-       :desc "Jump to next error" [f2]   #'flycheck-next-error
-       :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
-
-      (:after lsp-mode
-       :map lsp-mode-map
-       ;; :desc "Find definition" [f12] #'lsp-find-definition
-       :desc "Find references" [S-f12] #'lsp-find-references
-       :desc "Find implementations" [C-f12] #'lsp-find-implementation
-       :desc "Code actions..." [M-return] #'lsp-execute-code-action
-       :desc "Rename" [S-f6] #'lsp-rename))
+(map! :after lsp-mode
+      :map lsp-mode-map
+      ;; :desc "Find definition" [f12] #'lsp-find-definition
+      :desc "Find references" [S-f12] #'lsp-find-references
+      :desc "Find implementations" [C-f12] #'lsp-find-implementation
+      :desc "Code actions..." [M-return] #'lsp-execute-code-action
+      :desc "Rename" [S-f6] #'lsp-rename)
 
 (set-popup-rules!
   ;;  `help-mode', `helpful-mode' (same as default, excl :quit)
@@ -162,39 +166,33 @@
 ;;; packages
 
 (use-package! evil-cleverparens
-  :after evil smartparens
-
+  :when (modulep! :editor evil)
+  :after (evil smartparens)
   :init
-  ;; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
-  (setq evil-cleverparens-use-additional-bindings nil)
-
+  (setq evil-cleverparens-use-additional-bindings nil) ; Fix evil-cleverparens in terminal (https://github.com/emacs-evil/evil-cleverparens/issues/58)
   :config
+  (evil-set-command-properties 'evil-cp-change :move-point t)
   ;; When using terminal emacs, remap M-[ and M-], to M-b and M-B, respectively
   (unless window-system
     (setq evil-cp-additional-bindings (assoc-delete-all "M-[" evil-cp-additional-bindings))
     (setq evil-cp-additional-bindings (assoc-delete-all "M-]" evil-cp-additional-bindings))
     (add-to-list 'evil-cp-additional-bindings '("M-b" . evil-cp-wrap-next-square))
     (add-to-list 'evil-cp-additional-bindings '("M-B" . evil-cp-wrap-previous-square)))
-
-  (evil-set-command-properties 'evil-cp-change :move-point t)
   ;; enable these text-objects globally
   (require 'evil-cleverparens-text-objects)
   (add-hook! 'evil-cleverparens-mode-hook
     (evil-cp-set-additional-movement-keys)
     (evil-cp-set-additional-bindings))
-
   (setq evil-cleverparens-use-regular-insert nil
         evil-cleverparens-swap-move-by-word-and-symbol t
         evil-cleverparens-move-skip-delimiters nil
         evil-cleverparens-complete-parens-in-yanked-region nil
         evil-want-fine-undo t
-        evil-move-beyond-eol t)
+        evil-move-beyond-eol t))
 
-  ;; (map! :map evil-cleverparens-map
-  ;;       :leader
-  ;;       "(" #'evil-cp-wrap-next-round
-  ;;       ")" #'evil-cp-wrap-previous-round)
-  )
+;; (use-package! evil-visual-mark-mode
+;;   :when (modulep! :editor evil)
+;;   :after evil)
 
 (use-package! highlight-parenthesis
   :defer t)

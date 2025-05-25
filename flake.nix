@@ -147,33 +147,32 @@
             name = "DOOM";
             env = [
               {
-                name = "IN_DOOM_DEVSHELL";
-                value = 1;
-              }
-              {
-                name = "DOOM_DEVSHELL_DATE";
-                eval = "${pkgs.coreutils}/bin/date";
+                name = "DOOMDIR";
+                eval = "$(pwd)/"; # trailing slash expected
               }
               {
                 name = "EMACSDIR";
-                eval = ''$${XDG_CONFIG_HOME:-$${HOME}/.config}/emacs/'';
-              }
-              {
-                name = "DOOMDIR";
-                eval = "$${PRJ_ROOT}/";
+                eval = ''$HOME/.config/emacs/''; # trailing slash expected
               }
               {
                 name = "PATH";
-                eval = ''$${EMACSDIR?}bin:$${PRJ_ROOT}/bin:$PATH'';
+                eval = lib.concatStringsSep ":" (
+                  [
+                    "$PWD/bin"
+                    "$(printenv EMACSDIR)bin" # $${EMACSDIR}bin does not get escaped properly
+                  ]
+                  ++ (lib.optional pkgs.stdenv.isDarwin "/opt/homebrew/bin")
+                  ++ lib.singleton "$PATH"
+                );
               }
             ];
             commands = [
-              {
-                category = "example";
-                help = "print hello";
-                name = "hello";
-                command = "echo hello";
-              }
+              # {
+              #   category = "example";
+              #   help = "print hello";
+              #   name = "hello";
+              #   command = "echo hello";
+              # }
             ];
             packages = lib.concatLists (lib.attrValues modulePackages);
           };

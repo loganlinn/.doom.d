@@ -20,6 +20,7 @@
 (package! prisma-mode :recipe (:host github :repo "pimeys/emacs-prisma-mode" :branch "main"))
 ;; (package! codeium :disable t :recipe (:host github :repo "Exafunction/codeium.el"))
 ;; (package! copilot-chat :disable t)
+;; (package! evil-visual-mark-mode :recipe (:host github :repo "roman/evil-visual-mark-mode"))
 ;; (package! fence-edit :recipe (:host github :repo "aaronbieber/fence-edit.el") :pin "fab7cee16e91c2d8f9c24e2b08e934fa0813a774")
 ;; (package! gh-notify :disable t)
 ;; (package! graphviz-dot-mode :disable t)
