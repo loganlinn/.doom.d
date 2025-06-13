@@ -1,28 +1,10 @@
-;;; init.el -*- lexical-binding: t; -*-
-
-;; This file controls what Doom modules are enabled and what order they load
-;; in. Remember to run 'doom sync' after modifying it!
-
-;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
-;;      documentation. There you'll find a link to Doom's Module Index where all
-;;      of our modules are listed, including what flags they support.
-;;
-;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
-;;      'C-c c k' for non-vim users) to view its documentation. This works on
-;;      flags as well (those symbols that start with a plus).
-;;
-;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
-;;      directory (for easy access to its source code).
-
-(setq byte-compile-warnings '(not obsolete))
-
+;;; -*- lexical-binding: t; -*-
 (defconst IS-WSL (and IS-LINUX (getenv "WSLENV")))
-
-;;;; per https://github.com/emacs-lsp/lsp-mode#performance
+;; (setq byte-compile-warnings '(not obsolete))
+;;; per https://github.com/emacs-lsp/lsp-mode#performance
 ;; (setenv "LSP_USE_PLISTS" "true")
 ;; (setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
 ;; (setq read-process-output-max (* 1024 1024)) ;; 1MB
-
 (doom! :inputinit
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
@@ -52,7 +34,7 @@
        ;;neotree                    ; a project drawer, like NERDTree for vim
        ophints                      ; highlight the region an operation acts on
        (popup +defaults)       ; tame sudden yet inevitable temporary windows
-       ;;(smooth-scroll +interpolate) ; So smooth you won't believe it's not butter
+       (smooth-scroll +interpolate) ; So smooth you won't believe it's not butter
        tabs                         ; a tab bar for Emacs
        (treemacs +lsp)              ; a project drawer, like neotree but cooler
        unicode                      ; extended unicode support for various languages
@@ -82,7 +64,7 @@
        :emacs
        (dired +icons)   ; making dired pretty [functional]
        electric         ; smarter, keyword-based electric-indent
-       ;;eww            ; the internet is gross
+       eww            ; the internet is gross
        (ibuffer +icons) ; interactive buffer management
        undo             ; persistent, smarter undo for your inevitable mistakes
        vc               ; version-control and Emacs, sitting in a tree

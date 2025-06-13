@@ -3,6 +3,9 @@
 ;; https://github.com/doomemacs/doomemacs/pull/7079
 ;; (setq +clojure-load-clj-refactor-with-lsp t)
 
+(after! clojure
+  (add-hook 'clojure-mode-hook #'format-all-mode))
+
 (map! (:after clojure-mode
        :map clojure-mode-map
        (:localleader

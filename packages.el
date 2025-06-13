@@ -1,10 +1,5 @@
 ;; -*- no-byte-compile: t; -*-
-;;; ~/.doom.d/packages.el
-
-(package! doom-themes
-  :recipe (:host github :repo "loganlinn/doom-themes")
-  :pin "e47e604290ffe16b01e64c585d7c21c4b2a9d94a")
-
+(package! doom-themes :recipe (:host github :repo "loganlinn/doom-themes"))
 (package! aggressive-indent)
 (package! aidermacs)
 (package! button-lock)
@@ -12,7 +7,7 @@
 (package! docker-compose-mode)
 (package! evil-cleverparens :recipe (:host github :repo "emacs-evil/evil-cleverparens") :pin "134fe3396f975fb1ad261f52cd113f42ac1da4fc")
 (package! fnm :recipe (:host github :repo "bobrowadam/fnm.el"))
-(package! highlight-parentheses)
+(package! git-auto-commit-mode :recipe (:host github :repo "ryuslash/git-auto-commit-mode"))
 (package! kagi)
 (package! keycast)
 (package! mermaid-mode)
@@ -24,6 +19,7 @@
 ;; (package! fence-edit :recipe (:host github :repo "aaronbieber/fence-edit.el") :pin "fab7cee16e91c2d8f9c24e2b08e934fa0813a774")
 ;; (package! gh-notify :disable t)
 ;; (package! graphviz-dot-mode :disable t)
+;; (package! highlight-parentheses)
 ;; (package! kubel :disable t)
 ;; (package! kubel-evil :disable t)
 ;; (package! minions :disable t)
@@ -39,5 +35,3 @@
 ;; (package! vertico-posframe :recipe (:host github :repo "tumashu/vertico-posframe") :pin "db9fbc95bb8316165ec74e500a76d6857e6ced1a" :disable t)
 ;; (package! yuck-mode :disable t)
 ;; (package! zprint-mode :disable t)
-
-;;; ~/.doom.d/packages.el ends here

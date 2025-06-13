@@ -93,13 +93,15 @@
          :desc "Swap right" ">" #'+workspace/swap-right)))
 
 (map! :after evil
+      (:when (modulep! :ui tabs)
+        :map 'override
+        :n "L"   #'+tabs:next-or-goto
+        :n "H"   #'+tabs:previous-or-goto)
       (:map view-mode-map ; i.e. read-only files
        :n "0" #'evil-beginning-of-line)
-
       (:map prog-mode-map ; unwanted in term modes
        :nv "C-a" #'evil-numbers/inc-at-pt
        :nv "C-S-a" #'evil-numbers/dec-at-pt)
-
       :nv :desc "next tab" [S-l] #'+tabs:next-or-goto
       :nv :desc "previous tab" [S-h] #'+tabs:previous-or-goto)
 
@@ -134,10 +136,12 @@
       :desc "Rename file" [f2] #'treemacs-rename-file
       :desc "Refresh" [f5] #'treemacs-refresh)
 
-(map! :after flycheck
-      :map flycheck-mode-map
-      :desc "Jump to next error" [f2]   #'flycheck-next-error
-      :desc "Jump to prev error" [S-f2] #'flycheck-previous-error)
+(after! flycheck
+  (map! :map flycheck-mode-map
+        :desc "Jump to next error" [f2]   #'flycheck-next-error
+        :desc "Jump to prev error" [S-f2] #'flycheck-previous-error
+        :m "]e" #'flycheck-next-error
+        :m "[e" #'flycheck-previous-error))
 
 (map! :after lsp-mode
       :map lsp-mode-map
@@ -404,11 +408,11 @@
 (when (modulep! :lang crystal) (load! "+crystal"))
 (when (modulep! :lang emacs-lisp) (load! "+emacs-lisp"))
 (when (modulep! :lang javascript) (load! "+javascript"))
-(when (modulep! :lang llm) (load! "+llm"))
 (when (modulep! :lang lsp) (load! "+lsp"))
 (when (modulep! :lang lua) (load! "+lua"))
 (when (modulep! :lang nix) (load! "+nix"))
 (when (modulep! :lang org) (load! "+org"))
+(when (modulep! :tools llm) (load! "+llm"))
 (when IS-MAC (load! "+darwin"  nil t))
 (when IS-LINUX (load! "+linux"  nil t))
 (when IS-WINDOWS (load! "+windows"  nil t))
