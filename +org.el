@@ -33,7 +33,7 @@
       (save-buffer))))
 
 (after! org
-  (setq org-directory (+org/ensure-trailing-slash (or (getenv "XDG_NOTES_DIR") "~/Notes/"))) ;; yes, trailing slash
+  (setq org-directory (+org/ensure-trailing-slash "~/org/")) ;; yes, trailing slash
   (setq org-display-remote-inline-images t)
   (add-to-list 'org-modules 'ol-man))
 
