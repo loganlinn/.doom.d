@@ -418,3 +418,6 @@
 (when IS-WINDOWS (load! "+windows"  nil t))
 (load! (concat "+systems/" (system-name)) nil t)
 (load! "+local" nil t)
+
+;; (unless (server-running-p)
+;;   (server-start))
