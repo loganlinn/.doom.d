@@ -2,6 +2,7 @@
 (package! aggressive-indent)
 (package! aidermacs)
 (package! button-lock)
+(package! claude-code-ide :recipe (:host github :repo "manzaltu/claude-code-ide.el"))
 (package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 (package! docker-compose-mode)
 (package! doom-themes :recipe (:host github :repo "loganlinn/doom-themes"))
