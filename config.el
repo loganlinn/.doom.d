@@ -365,7 +365,7 @@
 
 (defun my/turn-on-lisp-modes ()
   (interactive)
-  (rainbow-delimiters-mode 1)
+  ;; (rainbow-delimiters-mode 1)
   ;; does not respect :style/indent metadata...
   ;; (aggressive-indent-mode 1)
   (smartparens-global-mode 1)
