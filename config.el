@@ -276,10 +276,14 @@
   (when (modulep! :tools magit)
     (evil-ex-define-cmd "Gwrite" #'magit-stage-file)))
 
-(after! format-all
-  (add-hook! 'go-mode-hook #'format-all-mode)
-  (add-hook! 'rust-mode-hook #'format-all-mode)
-  (add-hook! 'sh-mode-hook #'format-all-mode))
+(setq +format-on-save-disabled-modes
+      '(sql-mode
+        tex-mode
+        latex-mode
+        LaTeX-mode
+        org-msg-edit-mode))
+
+(setq-hook! 'dockerfile-mode-hook apheleia-inhibit t) ;; dockfmt, gtfo
 
 ;;; :checkers
 
