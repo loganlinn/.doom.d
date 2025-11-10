@@ -38,7 +38,21 @@
         (print! "Configured nix-repl file: %s" repl-file)))))
 
 (after! lsp-nix
-  (setq lsp-nix-nil-formatter ["nixpkgs-fmt"]))
+  (setq lsp-nix-nil-formatter ["alejandra"]
+        lsp-nix-nixd-nixpkgs-expr
+        "import <nixpkgs> {}"
+        ;; (format "import (builtins.getFlake\"%s\").inputs.nixpkgs {}"
+        ;;         (or (getenv "FLAKE_ROOT")
+        ;;             (getenv "DOTFILES_DIR")
+        ;;             (expand-file-name "~/.dotfiles")))
+        )
+  ;; TODO lsp-nix-nixd-nixos-options-expr
+  ;; (when (string-prefix-p "Logan-Gamma" (system-name))
+  ;;   (setq lsp-nix-nixd-home-manager-options-expr
+  ;;         (format "(builtins.getFlake \"%s\").darwinConfigurations.logamma.options.home-manager"
+  ;;                 (or (getenv "DOTFILES_DIR")
+  ;;                     (expand-file-name "~/.dotfiles")))))
+  )
 
 (after! (:and evil nix-repl)
   (set-evil-initial-state! 'nix-repl-mode 'insert))

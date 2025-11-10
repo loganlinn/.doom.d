@@ -34,8 +34,42 @@
 
 (after! org
   (setq org-directory (+org/ensure-trailing-slash "~/org/")) ;; yes, trailing slash
+  (setq org-agenda-files '("~/org/tasks.org" "~/org/travel.org" "~/org/finance.org" "~/org/calendar.org"))
+  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")))
   (setq org-display-remote-inline-images t)
-  (add-to-list 'org-modules 'ol-man))
+  (setq org-checkbox-hierarchical-statistics t)
+  (setq org-log-done 'time)
+  (setq org-startup-folded 'nofold)
+  (add-to-list 'org-modules 'ol-man)
+  ;; (setq org-capture-templates
+  ;;       `(
+  ;;         ;; Quick idea for a future trip
+  ;;         ("T" "Trip idea" entry
+  ;;          (file+headline "~/org/travel.org" "Trips")
+  ;;          "* TODO %^{Destination} :travel:\n:PROPERTIES:\n:FROM: %^{From|TBD}\n:TO: %^{To|TBD}\n:BUDGET: %^{Budget|TBD}\n:END:\n*** TODO Itinerary\n*** TODO Packing :packing:\n*** TODO Bookings\n" :empty-lines 1)
+  ;;         ;; Trip research from anywhere (e.g., from a web link)
+  ;;         ("t" "Trip note" entry
+  ;;          (file+headline "~/org/travel.org" "Inbox")
+  ;;          "* %? :travel:\nSource: %x\n" :empty-lines 1)
+  ;;         ))
+  ;; (push '("c" "Insert checklist into current heading"
+  ;;         plain (function org-insert-heading)
+  ;;         "%(with-current-buffer (find-file-noselect \"~/org/checklists.org\")
+  ;;          (save-excursion
+  ;;            (goto-char (point-min))
+  ;;            (re-search-forward \"^\\* Trip Planning Checklist\")
+  ;;            (buffer-substring (point) (save-excursion (org-end-of-subtree t t)))))
+  ;;       :immediate-finish t)
+  ;;     org-capture-templates)
+  )
+
+(after! doom-docs
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--display-menu-h)
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--hide-meta-h)
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--hide-tags-h)
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--hide-drawers-h)
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--expand-macros-h)
+  (remove-hook! 'doom-docs-mode-hook #'doom-docs--hide-src-blocks-h))
 
 (after! org-capture
   (setq! org-capture-templates

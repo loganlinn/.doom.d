@@ -305,6 +305,11 @@
   ;; automaticailly refresh magit buffers when files are saved
   (add-hook! 'after-save-hook #'magit-after-save-refresh-status))
 
+(use-package! git-spice
+  :after magit
+  :config
+  (git-spice-setup-magit-section))
+
 (after! gist
   (setq gist-view-gist t))
 
@@ -405,7 +410,20 @@
 
 (use-package! powershell :defer t)
 
+(use-package! caddyfile-mode
+  :mode (("Caddyfile\\'" . caddyfile-mode)
+         ("caddy\\.conf\\'" . caddyfile-mode))
+  :config
+  (set-formatter! 'caddyfile '("caddy" "format") :modes '(caddyfile-mode)))
+
+(setq-hook! 'hcl-mode-hook +format-with 'terraform)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(load! "src-get")
+(map! :leader
+      :prefix "g"
+      :desc "Clone repository" "C" #'src-get)
 
 (when (modulep! :completion vertico) (load! "+vertico"))
 (when (modulep! :lang clojure) (load! "+clojure"))
@@ -417,9 +435,9 @@
 (when (modulep! :lang nix) (load! "+nix"))
 (when (modulep! :lang org) (load! "+org"))
 (when (modulep! :tools llm) (load! "+llm"))
-(when IS-MAC (load! "+darwin"  nil t))
-(when IS-LINUX (load! "+linux"  nil t))
-(when IS-WINDOWS (load! "+windows"  nil t))
+(when (featurep :system 'macos) (load! "+darwin"  nil t))
+(when (featurep :system 'linux) (load! "+linux"  nil t))
+(when (featurep :system 'windows) (load! "+windows"  nil t))
 (load! (concat "+systems/" (system-name)) nil t)
 (load! "+local" nil t)
 

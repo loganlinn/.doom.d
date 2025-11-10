@@ -6,4 +6,7 @@
           lsp-clients-lua-lsp-server-install-dir lsp-clients-lua-language-server-bin
           ;; lsp-clients-lua-language-server-main-location "/opt/lua-language-server/main.lua"
           lsp-lua-hint-enable t
-          lsp-lua-hint-set-type t)))
+          lsp-lua-hint-set-type t))
+  ;; automatically start fennel-ls
+  (after! fennel-mode
+    (add-hook 'fennel-mode-local-vars-hook #'lsp! 'append)))

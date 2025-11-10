@@ -36,9 +36,11 @@
                  "[/\\\\]\\.mypy_cache\\'"
                  "[/\\\\]\\.pytest_cache\\'"
                  "[/\\\\]\\.cache\\'"
+                 "[/\\\\]\\.terraform\\'"
                  "[/\\\\]\\.clwb\\'"
                  "[/\\\\]__pycache__\\'"
                  "[/\\\\]\\.devenv\\'"
+                 "[/\\\\]\\.direnv\\'"
                  "[/\\\\]\\.go\\'"
                  "[/\\\\]\\.env\\'"
                  "[/\\\\]\\.local\\'"
@@ -47,8 +49,8 @@
                  "[/\\\\]bazel-genfiles\\'"
                  "[/\\\\]bazel-out\\'"
                  "[/\\\\]bazel-testlogs\\'"
+                 "[/\\\\]node_modules\\'"
                  "[/\\\\]third_party\\'"
-                 "[/\\\\]third-party\\'"
                  "[/\\\\]buildtools\\'"
                  "[/\\\\]out\\'"))
     (push dir lsp-file-watch-ignored-directories)))

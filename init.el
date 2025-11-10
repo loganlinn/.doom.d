@@ -1,10 +1,4 @@
 ;;; -*- lexical-binding: t; -*-
-(defconst IS-WSL (and IS-LINUX (getenv "WSLENV")))
-;; (setq byte-compile-warnings '(not obsolete))
-;;; per https://github.com/emacs-lsp/lsp-mode#performance
-;; (setenv "LSP_USE_PLISTS" "true")
-;; (setq gc-cons-threshold (* 100 1024 1024)) ;; 100MB
-;; (setq read-process-output-max (* 1024 1024)) ;; 1MB
 (doom! :inputinit
        ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
@@ -13,27 +7,30 @@
 
        :completion
        ;;(company +childframe)
-       (corfu +orderless +icons)
+       (corfu +orderless +icons +dabbrev)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
-       vertico
+       (vertico +icons)
 
        :ui
        ;;deft                       ; notational velocity for Emacs
        doom                         ; what makes DOOM look the way it does
-       doom-dashboard               ; a nifty splash screen for Emacs
+       ;; doom-dashboard               ; a nifty splash screen for Emacs
        ;; doom-quit                 ; DOOM quit-message prompts when you quit Emacs
        (emoji +unicode +github)     ; 🙂
        hl-todo                      ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        indent-guides                ; highlighted indent columns
        ;;ligatures                  ; ligatures and symbols to make your code pretty again
        ;;minimap                    ; show a map of the code on the side
-       modeline                     ; snazzy, Atom-inspired modeline, plus API
+       (modeline                    ; snazzy, Atom-inspired modeline, plus API
+        +light)
        nav-flash                    ; blink cursor line after big motions
        ;;neotree                    ; a project drawer, like NERDTree for vim
        ophints                      ; highlight the region an operation acts on
-       (popup +defaults)       ; tame sudden yet inevitable temporary windows
+       (popup                       ; tame sudden yet inevitable temporary windows
+        ;; +all ;; error: walk-window-tree-1: Lisp nesting exceeds ‘max-lisp-eval-depth’
+        +defaults)
        (smooth-scroll +interpolate) ; So smooth you won't believe it's not butter
        tabs                         ; a tab bar for Emacs
        (treemacs +lsp)              ; a project drawer, like neotree but cooler
@@ -45,13 +42,15 @@
        zen                          ; distraction-free coding or writing
 
        :editor
-       (:cond (IS-WSL evil)
-              (IS-LINUX (evil +everywhere))
-              (IS-MAC (evil +everywhere))
+       (:cond ((featurep :system 'wsl) evil)
+              ((featurep :system 'linux) (evil +everywhere))
+              ((featurep :system 'macos) (evil +everywhere))
               (t evil))
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
-       (format +lsp +onsave)  ; automated prettiness
+       (format           ; automated prettiness
+        +lsp
+        +onsave)
        ;;god             ; run Emacs commands without modifier keys
        ;;lispy           ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
@@ -62,10 +61,12 @@
        word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +icons)   ; making dired pretty [functional]
+       (dired           ; making dired pretty [functional]
+        +icons)
        electric         ; smarter, keyword-based electric-indent
-       eww            ; the internet is gross
-       (ibuffer +icons) ; interactive buffer management
+       eww              ; the internet is gross
+       (ibuffer         ; interactive buffer management
+        +icons)
        undo             ; persistent, smarter undo for your inevitable mistakes
        vc               ; version-control and Emacs, sitting in a tree
 
@@ -76,15 +77,13 @@
        vterm            ; the best terminal emulation in Emacs
 
        :checkers
-       syntax           ; tasing you for every semicolon you forget
-       (spell           ; tasing you for misspelling misspelling
-        +flyspell
-        ;; +aspell
-        +hunspell)
+       (syntax          ; tasing you for every semicolon you forget
+        +childframe
+        +icons)
+       ;;(spell +flyspell) ; tasing you for misspelling mispelling
        ;;grammar        ; tasing grammar mistake every you make
 
        :tools
-       llm
        ;;ansible
        ;;biblio         ; Writes a PhD for you (citation needed)
        ;;collab         ; buffers with friends
@@ -92,16 +91,15 @@
        direnv
        (docker +lsp)
        editorconfig     ; let someone else argue about tabs vs spaces
-       ;;in             ; tame Jupyter notebooks with emacs
+       ;;ein            ; tame Jupyter notebooks with emacs
        (eval +overlay)  ; run code, run (also, repls)
-       (lookup          ; offline dictionary/thesaurus lookup (install wordnet, i.e. `wn' command)
-        +dictionary
-        +offline)
+       lookup           ; navigate your code and its documentation
+       llm              ; when I said you needed friends, I didn't mean...
        (lsp +peek)      ; M-x vscode
        (magit +forge)   ; a git porcelain for Emacs
        make             ; run make tasks from Emacs
        (pass +auth)     ; password manager for nerds
-       pdf              ; pdf enhancements
+       ;;pdf            ; pdf enhancements
        ;;prodigy        ; FIXME managing external services & code builders
        ;;tmux           ; an API for interacting with tmux
        tree-sitter
@@ -111,13 +109,13 @@
        just
 
        :os
-       (:if IS-MAC macos)             ; improve compatibility with macOS
-       (tty +osc)                     ; improve the terminal Emacs experience
+       (:if (featurep :system 'macos) macos)             ; improve compatibility with macOS
+       tty                     ; improve the terminal Emacs experience
 
        :lang
        ;;agda                         ; types of types of types of types...
        ;;beancount                    ; mind the GAAP
-       (cc +lsp)                      ; C > C++ == 1
+       ;; (cc +lsp)                      ; C > C++ == 1
        (clojure +lsp +tree-sitter)    ; java with a lisp
        ;;common-lisp                  ; if you've seen one lisp, you've seen them all
        ;;coq                          ; proofs-as-programs
@@ -126,7 +124,7 @@
        data                           ; config/data formats
        ;;(dart +flutter)              ; paint ui and not much else
        ;;dhall
-       ;;elixir                       ; erlang done right
+       (elixir +lsp +tree-sitter)     ; erlang done right
        (elm +lsp +tree-sitter)        ; care for a cup of TEA?
        emacs-lisp                     ; drown in parentheses
        ;;erlang                       ; an elegant language for a more civilized age
@@ -137,7 +135,7 @@
        ;;fsharp                       ; ML stands for Microsoft's Language
        ;;fstar                        ; (dependent) types and (monadic) effects and Z3
        ;;gdscript                     ; the language you waited for
-       (go +lsp)                      ; the hipster dialect
+       (go +lsp +tree-sitter)         ; the hipster dialect
        (graphql +lsp)                 ; Give queries a REST
        ;;(haskell +lsp)               ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
@@ -203,16 +201,21 @@
        ;;(zig +lsp +tree-sitter)  ; C, but simpler
 
        :email
-       ;;(mu4e +org +gmail)
+       (mu4e
+        +org
+        +gmail
+        ;; +mbsync
+        ;; +offlineimap
+        )
        ;;notmuch
        ;;(wanderlust +gmail)
 
        :app
        ;;calendar
-       (:if IS-LINUX everywhere) ; *leave* Emacs!? You must be joking
+       (:if (or (featurep :system 'linux) (featurep :system 'macos)) everywhere) ; *leave* Emacs!? You must be joking
        ;;irc                     ; how neckbeards socialize
-       (rss +org +youtube)       ; emacs as an RSS reader
-       (:if IS-LINUX openai)
+       ;; (rss +org +youtube)       ; emacs as an RSS reader
+       ;; (:if (featurep :system 'linux) openai)
 
        :config
        ;;literate
