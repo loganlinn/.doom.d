@@ -50,11 +50,11 @@
        :desc "Clean ns" "o"    #'lsp-clojure-clean-ns
        :desc "Clean ns" "C-o"  #'lsp-clojure-clean-ns))
 
+;; Keep polylith support while preferring git root in monorepos
 (setq-hook! clojure-mode
   projectile-project-root-functions
   '(projectile-root-local
     +polylith/projectile-root-dir
-    projectile-root-bottom-up
     projectile-root-top-down
     projectile-root-top-down-recurring))
 

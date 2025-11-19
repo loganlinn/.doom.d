@@ -5,3 +5,4 @@ custom.el
 eshell/history
 eshell/lastdir
 .lsp/.cache
+.clj-kondo/.cache

@@ -117,13 +117,16 @@
       [C-f12]   #'+lookup/implementations)
 
 (map! :after vertico
-      :map vertico-map
-      :desc "Quick insert" [M-q] #'vertico-quick-insert
-      :desc "Quick exit" [C-q] #'vertico-quick-exit
-      ;; vertico-exit completes with first suggestion, while
-      ;; vertico-exit-input completes with current input.
-      ;; This distinction is needed when, for example, an existing file is being renamed.
-      :desc "Exit with input" [M-return] #'vertico-exit-input)
+      (:map vertico-map
+       :desc "Quick insert" [M-q] #'vertico-quick-insert
+       :desc "Quick exit" [C-q] #'vertico-quick-exit
+       ;; vertico-exit completes with first suggestion, while
+       ;; vertico-exit-input completes with current input.
+       ;; This distinction is needed when, for example, an existing file is being renamed.
+       :desc "Exit with input" [M-return] #'vertico-exit-input)
+      (:map minibuffer-local-map
+       :desc "Split horizontal" [C-h] #'+embark:split-horizontal-current-completion-candidate
+       :desc "Split vertical" [C-v] #'+embark:split-vertical-current-completion-candidate))
 
 (map! :after projectile
       :leader
@@ -217,7 +220,12 @@
         projectile-current-project-on-switch 'move-to-end
         projectile-enable-caching nil
         ;; projectile-indexing-method 'hybrid ;; disabled due issues with files that exist not being reported
-        projectile-indexing-method 'alien))
+        projectile-indexing-method 'alien
+        ;; Prefer git repository root over nested project markers in monorepos
+        projectile-project-root-functions
+        '(projectile-root-local
+          projectile-root-top-down
+          projectile-root-top-down-recurring)))
 
 (after! (:and projectile treemacs)
   (add-hook! 'projectile-before-switch-project-hook
@@ -434,7 +442,7 @@
 (when (modulep! :lang lua) (load! "+lua"))
 (when (modulep! :lang nix) (load! "+nix"))
 (when (modulep! :lang org) (load! "+org"))
-(when (modulep! :tools llm) (load! "+llm"))
+(when (modulep! :tools llm) (load! "+copilot") (load! "+gptel"))
 (when (featurep :system 'macos) (load! "+darwin"  nil t))
 (when (featurep :system 'linux) (load! "+linux"  nil t))
 (when (featurep :system 'windows) (load! "+windows"  nil t))
