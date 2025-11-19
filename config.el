@@ -220,12 +220,7 @@
         projectile-current-project-on-switch 'move-to-end
         projectile-enable-caching nil
         ;; projectile-indexing-method 'hybrid ;; disabled due issues with files that exist not being reported
-        projectile-indexing-method 'alien
-        ;; Prefer git repository root over nested project markers in monorepos
-        projectile-project-root-functions
-        '(projectile-root-local
-          projectile-root-top-down
-          projectile-root-top-down-recurring)))
+        projectile-indexing-method 'alien))
 
 (after! (:and projectile treemacs)
   (add-hook! 'projectile-before-switch-project-hook

@@ -43,9 +43,11 @@ The package directory is determined by locating the nearest package.json file."
       "e" #'lsp-eslint-apply-all-fixes)
 
 (after! projectile
-  ;; Recognize package.json as a project marker, but prefer git root in monorepos
-  (add-to-list 'projectile-project-root-files "package.json")
-  (add-to-list 'projectile-project-root-files "tsconfig.json"))
+  ;; Consider directories with these files as project roots, even in a monorepo
+  (setq projectile-project-root-files (append '("package.json") projectile-project-root-files)
+        projectile-project-root-files-bottom-up
+        (append '("package.json" "tsconfig.json")
+                projectile-project-root-files-bottom-up)))
 
 ;; Configure LSP to detect project roots in monorepo subdirectories
 (after! lsp-mode
@@ -59,3 +61,9 @@ The package directory is determined by locating the nearest package.json file."
             (setq-local lsp-workspace-root
                         (or (locate-dominating-file buffer-file-name "tsconfig.json")
                             (locate-dominating-file buffer-file-name "package.json")))))))
+
+(setq-hook! typescript-mode
+  projectile-project-root-functions
+  '(projectile-root-local
+    projectile-root-top-down
+    projectile-root-top-down-recurring))
