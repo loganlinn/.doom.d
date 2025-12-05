@@ -25,6 +25,7 @@
 ;; (package! gh-notify :disable t)
 ;; (package! graphviz-dot-mode :disable t)
 ;; (package! highlight-parentheses)
+(package! kkp)
 ;; (package! kubel :disable t)
 ;; (package! kubel-evil :disable t)
 ;; (package! minions :disable t)

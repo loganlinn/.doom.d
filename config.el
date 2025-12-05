@@ -25,6 +25,8 @@
       doom-themes-treemacs-theme "doom-colors"
       doom-themes-treemacs-enable-variable-pitch nil)
 
+(setq rmh-elfeed-org-files (list "~/org/rss.org"))
+
 (when (modulep! :ui doom-dashboard)
   (add-to-list '+doom-dashboard-menu-sections
                '("Open daily note"
@@ -367,6 +369,7 @@
 
 ;;; :lang
 
+(setq sh-indentation 2)
 (add-hook! 'sh-mode-hook
   (when (string-match "\\.zsh$" buffer-file-name)
     (sh-set-shell "zsh")))

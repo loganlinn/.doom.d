@@ -214,7 +214,7 @@
        ;;calendar
        (:if (or (featurep :system 'linux) (featurep :system 'macos)) everywhere) ; *leave* Emacs!? You must be joking
        ;;irc                     ; how neckbeards socialize
-       ;; (rss +org +youtube)       ; emacs as an RSS reader
+       (rss +org)       ; emacs as an RSS reader
        ;; (:if (featurep :system 'linux) openai)
 
        :config
