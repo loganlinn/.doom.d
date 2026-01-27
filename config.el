@@ -431,6 +431,14 @@
       :prefix "g"
       :desc "Clone repository" "C" #'src-get)
 
+(map! :leader
+      (:prefix-map ("a" . "AI")
+       (:prefix-map ("s" . "send to Claude")
+        :desc "Send context (current tab)" "l" #'kitty-rc-send-to-claude
+        :desc "Send context (all tabs)"    "a" #'kitty-rc-send-to-claude-all
+        :desc "Select Claude window"       "s" #'kitty-rc-select-claude-window)
+       :desc "Focus Claude"                "f" #'kitty-rc-focus-claude))
+
 (when (modulep! :completion vertico) (load! "+vertico"))
 (when (modulep! :lang clojure) (load! "+clojure"))
 (when (modulep! :lang crystal) (load! "+crystal"))

@@ -1,4 +1,6 @@
 ;;; +org.el -*- lexical-binding: t; -*-
+(require 'org-protocol)
+
 
 (defun +org/ensure-trailing-slash (path)
   "Ensure PATH ends with a trailing slash."
@@ -93,7 +95,7 @@
             (file+headline +org-capture-project-todo-file "Inbox") "* TODO %?\n%i\n%a"
             :prepend t)
 
-           ("pn" "Project-local notes" entry
+           ("on" "Project-local notes" entry
             (file+headline +org-capture-project-notes-file "Inbox") "* %U %?\n%i\n%a"
             :prepend t)
 
