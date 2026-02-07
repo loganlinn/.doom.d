@@ -46,7 +46,7 @@
               ((featurep :system 'linux) (evil +everywhere))
               ((featurep :system 'macos) (evil +everywhere))
               (t evil))
-       file-templates    ; auto-snippets for empty files
+       ;; file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
        (format           ; automated prettiness
         +lsp
@@ -75,6 +75,7 @@
        ;;shell          ; simple shell REPL for Emacs
        ;;term           ; basic terminal emulator for Emacs
        vterm            ; the best terminal emulation in Emacs
+       kitty
 
        :checkers
        (syntax          ; tasing you for every semicolon you forget
@@ -95,18 +96,16 @@
        (eval +overlay)  ; run code, run (also, repls)
        lookup           ; navigate your code and its documentation
        llm              ; when I said you needed friends, I didn't mean...
-       (lsp +peek)      ; M-x vscode
+       (lsp +eglot +booster +peek)      ; M-x vscode
        (magit +forge)   ; a git porcelain for Emacs
-       make             ; run make tasks from Emacs
+       ;; make             ; run make tasks from Emacs
        (pass +auth)     ; password manager for nerds
        ;;pdf            ; pdf enhancements
        ;;prodigy        ; FIXME managing external services & code builders
-       ;;tmux           ; an API for interacting with tmux
+       tmux             ; an API for interacting with tmux
        tree-sitter
        (terraform +lsp) ; infrastructure as code
        ;;upload         ; map local to remote projects via ssh/ftp
-
-       just
 
        :os
        (:if (featurep :system 'macos) macos)             ; improve compatibility with macOS
@@ -124,8 +123,8 @@
        data                           ; config/data formats
        ;;(dart +flutter)              ; paint ui and not much else
        ;;dhall
-       (elixir +lsp +tree-sitter)     ; erlang done right
-       (elm +lsp +tree-sitter)        ; care for a cup of TEA?
+       ;; (elixir +lsp +tree-sitter)     ; erlang done right
+       ;; (elm +lsp +tree-sitter)        ; care for a cup of TEA?
        emacs-lisp                     ; drown in parentheses
        ;;erlang                       ; an elegant language for a more civilized age
        ;;ess                          ; emacs speaks statistics
@@ -136,11 +135,11 @@
        ;;fstar                        ; (dependent) types and (monadic) effects and Z3
        ;;gdscript                     ; the language you waited for
        (go +lsp +tree-sitter)         ; the hipster dialect
-       (graphql +lsp)                 ; Give queries a REST
+       (graphql +lsp +tree-sitter)    ; Give queries a REST
        ;;(haskell +lsp)               ; a language that's lazier than I am
        ;;hy                           ; readability of scheme w/ speed of python
        ;;idris                        ; a language you can depend on
-       janet                          ; Fun fact: Janet is me!
+       ;; janet                          ; Fun fact: Janet is me!
        ;;(java +lsp +tree-sitter)     ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter) ; all(hope(abandon(ye(who(enter(here))))))
        (json +lsp +tree-sitter)       ; At least it ain't XML
@@ -150,37 +149,37 @@
        ;;lean                         ; for folks with too much to prove
        ;;ledger                       ; be audit you can be
        (lua +lsp +fennel)             ; one-based indices? one-based indices
-       (markdown +grip)               ; writing docs for people to ignore
+       (markdown +grip +tree-sitter)  ; writing docs for people to ignore
        ;;nim                          ; python + lisp at the speed of c
        (nix +lsp +tree-sitter)        ; I hereby declare "nix geht mehr!"
        ;;ocaml                        ; an objective camel
        (org
-        +contacts
-        +crypt
+        ;; +contacts
+        ;; +crypt
         +dragndrop
-        +gnuplot
-        +hugo
-        +journal
-        +pandoc
-        +passwords
-        +pomodoro
+        ;; +gnuplot
+        ;; +hugo
+        ;; +journal
+        ;; +pandoc
+        ;; +passwords
+        ;; +pomodoro
         +present
         +pretty
-        +roam2
+        +roam
         ;; +brain
         ;; +jupyter
         ;; +noter
         )
        ;;php                           ; perl's insecure younger brother
-       plantuml                        ; diagrams for confusing people more
+       ;; plantuml                        ; diagrams for confusing people more
        ;;graphviz                      ; diagrams for confusing yourself even more
        ;;purescript                    ; javascript, but functional
        (python
-        +cython
+        ;; +cython
         +lsp
-        +poetry
-        +pyright
-        +pyenv
+        ;; +poetry
+        ;; +pyright
+        +uv
         +tree-sitter)
        ;;qt                                        ; the 'cutest' gui framework ever
        ;;racket                                    ; a DSL for DSLs
@@ -201,12 +200,12 @@
        ;;(zig +lsp +tree-sitter)  ; C, but simpler
 
        :email
-       (mu4e
-        +org
-        +gmail
-        ;; +mbsync
-        ;; +offlineimap
-        )
+       ;; (mu4e
+       ;;  +org
+       ;;  +gmail
+       ;;  ;; +mbsync
+       ;;  ;; +offlineimap
+       ;;  )
        ;;notmuch
        ;;(wanderlust +gmail)
 
@@ -214,9 +213,12 @@
        ;;calendar
        (:if (or (featurep :system 'linux) (featurep :system 'macos)) everywhere) ; *leave* Emacs!? You must be joking
        ;;irc                     ; how neckbeards socialize
-       (rss +org)       ; emacs as an RSS reader
+       ;; (rss +org)       ; emacs as an RSS reader
        ;; (:if (featurep :system 'linux) openai)
 
        :config
+       (default +bindings +smartparens +gnupg)
        ;;literate
-       (default +bindings +smartparens +gnupg))
+
+       :lyl
+       (ai -copilot))

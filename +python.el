@@ -1,5 +1,8 @@
 ;;; +python.el -*- lexical-binding: t; -*-
 
+(after! python
+  (set-eglot-client! '(python-mode python-ts-mode) '("ty" "server")))
+
 (defun uv-activate ()
   "Activate Python environment managed by uv based on current project directory.
 Looks for .venv directory in project root and activates the Python interpreter."

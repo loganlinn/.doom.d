@@ -56,17 +56,35 @@
 ;;   (setq deft-directory (expand-file-name (or (getenv-internal "XDG_NOTES_DIR") "~/Notes"))
 ;;         deft-default-extension "md"))
 
+(defun +yank-buffer-path-with-line ()
+  "Copy project-relative file path with line number or range to kill ring.
+With active region, format as path:start-end. Otherwise path:line."
+  (interactive)
+  (if-let* ((filename (or (buffer-file-name (buffer-base-buffer))
+                          (bound-and-true-p list-buffers-directory)))
+            (path (file-relative-name filename (doom-project-root)))
+            (ref (if (use-region-p)
+                     (format "%s:%d-%d" path
+                             (line-number-at-pos (region-beginning))
+                             (line-number-at-pos (region-end)))
+                   (format "%s:%d" path (line-number-at-pos)))))
+      (progn
+        (kill-new ref)
+        (message "Copied: %s" ref))
+    (user-error "Couldn't find filename in current buffer")))
+
 (map! :leader
       (:prefix-map ("b" . "buffer")
        :desc "Kill buffer everywhere"     "k" #'doom/kill-this-buffer-in-all-windows
-       :desc "Kill matching buffers"      "/" #'doom/kill-matching-buffers)
+       :desc "Kill matching buffers"      "/" #'doom/kill-matching-buffers
+       :desc "Yank buffer path:line"      "Y" #'+yank-buffer-path-with-line)
 
       (:prefix-map ("p" . "project")
        :desc "Kill other project buffers" "K" #'doom/kill-project-buffers)
 
       (:prefix-map ("f" . "file")
        :desc "chmod"                      "M" #'chmod-this-file
-       :desc "ranger"                     "g" #'ranger)
+       :desc "ranger"                     "1" #'ranger)
 
       (:after evil
        :prefix-map ("q" . "quit/session")
@@ -431,14 +449,6 @@
       :prefix "g"
       :desc "Clone repository" "C" #'src-get)
 
-(map! :leader
-      (:prefix-map ("a" . "AI")
-       (:prefix-map ("s" . "send to Claude")
-        :desc "Send context (current tab)" "l" #'kitty-rc-send-to-claude
-        :desc "Send context (all tabs)"    "a" #'kitty-rc-send-to-claude-all
-        :desc "Select Claude window"       "s" #'kitty-rc-select-claude-window)
-       :desc "Focus Claude"                "f" #'kitty-rc-focus-claude))
-
 (when (modulep! :completion vertico) (load! "+vertico"))
 (when (modulep! :lang clojure) (load! "+clojure"))
 (when (modulep! :lang crystal) (load! "+crystal"))
@@ -448,11 +458,11 @@
 (when (modulep! :lang lua) (load! "+lua"))
 (when (modulep! :lang nix) (load! "+nix"))
 (when (modulep! :lang org) (load! "+org"))
-(when (modulep! :tools llm) (load! "+copilot") (load! "+gptel"))
 (when (featurep :system 'macos) (load! "+darwin"  nil t))
 (when (featurep :system 'linux) (load! "+linux"  nil t))
 (when (featurep :system 'windows) (load! "+windows"  nil t))
 (load! (concat "+systems/" (system-name)) nil t)
+(load! "+monorepo")
 (load! "+local" nil t)
 
 ;; (unless (server-running-p)
