@@ -328,10 +328,10 @@ With active region, format as path:start-end. Otherwise path:line."
   ;; automaticailly refresh magit buffers when files are saved
   (add-hook! 'after-save-hook #'magit-after-save-refresh-status))
 
-(use-package! git-spice
-  :after magit
-  :config
-  (git-spice-setup-magit-section))
+;; (use-package! git-spice
+;;   :after magit
+;;   :config
+;;   (git-spice-setup-magit-section))
 
 (after! gist
   (setq gist-view-gist t))
