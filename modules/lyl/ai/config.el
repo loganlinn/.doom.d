@@ -36,19 +36,19 @@
 ;; (after! dall-e-shell
 ;;   (setq dall-e-shell-model-version "dall-e-3"))
 
-;; (defvar llm-refactoring-provider nil)
-;; (after! llm
-;;   (require 'llm-openai)
-;;   (setq llm-refactoring-provider
-;;         (make-llm-openai-compatible
-;;          :url "https://openrouter.ai/api/v1/"
-;;          :key (getenv "OPENROUTER_API_KEY")
-;;          :chat-model "z-ai/glm-4.5"
-;;          :default-chat-non-standard-params
-;;          `((http-referer . "https://github.com/ahyatt/llm")
-;;            (x-title . "Emacs LLM")))
-;;         magit-gptcommit-llm-provider llm-refactoring-provider
-;;         llm-warn-on-nonfree nil))
+(defvar llm-refactoring-provider nil)
+(after! llm
+  (require 'llm-openai)
+  (setq llm-refactoring-provider
+        (make-llm-openai-compatible
+         :url "https://openrouter.ai/api/v1/"
+         :key (getenv "OPENROUTER_API_KEY")
+         :chat-model "z-ai/glm-4.5"
+         :default-chat-non-standard-params
+         `((http-referer . "https://github.com/ahyatt/llm")
+           (x-title . "Emacs LLM")))
+        magit-gptcommit-llm-provider llm-refactoring-provider
+        llm-warn-on-nonfree nil))
 
 (after! gptel
   (setq gptel-model 'z-ai/glm-4.5
@@ -82,7 +82,8 @@
     (with-current-buffer buf (save-buffer))))
 
 (use-package! magit-gptcommit
-  :after magit :init
+  :after magit
+  :init
   :config
   (magit-gptcommit-mode 1)
   (magit-gptcommit-status-buffer-setup))
