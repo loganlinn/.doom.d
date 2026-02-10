@@ -26,6 +26,7 @@
 ;; Keybindings
 (map! :leader
       (:prefix "p"
-       :desc "Find file in git root" "f" #'+my/find-file-in-git-root)
+       :desc "Find file in git root" "f" #'+my/find-file-in-git-root
+       :desc "Yank project relative path" "y" #'+default/yank-buffer-path-relative-to-project)
       (:prefix "f"
        :desc "Yank path from git root" "Y" #'+my/yank-buffer-path-from-git-root))
