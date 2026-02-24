@@ -387,10 +387,12 @@ With active region, format as path:start-end. Otherwise path:line."
 
 ;;; :lang
 
-(setq sh-indentation 2)
+(after! sh-script
+  (setq sh-indentation 2))
 (add-hook! 'sh-mode-hook
-  (when (string-match "\\.zsh$" buffer-file-name)
-    (sh-set-shell "zsh")))
+  (defun +sh-maybe-zsh-h ()
+    (when (and buffer-file-name (string-match "\\.zsh$" buffer-file-name))
+      (sh-set-shell "zsh"))))
 
 (defun my/turn-on-lisp-modes ()
   (interactive)

@@ -53,14 +53,14 @@ The package directory is determined by locating the nearest package.json file."
 (after! lsp-mode
   (setq lsp-auto-guess-root t)  ;; Attempt to guess the project root
   ;; You can also set a custom root directory detection function
-  (setq lsp-before-initialize-hook
-        (lambda ()
-          (when (and buffer-file-name
-                     (or (locate-dominating-file buffer-file-name "tsconfig.json")
-                         (locate-dominating-file buffer-file-name "package.json")))
-            (setq-local lsp-workspace-root
-                        (or (locate-dominating-file buffer-file-name "tsconfig.json")
-                            (locate-dominating-file buffer-file-name "package.json")))))))
+  (add-hook! 'lsp-before-initialize-hook
+    (defun +javascript/detect-monorepo-root-h ()
+      (when (and buffer-file-name
+                 (or (locate-dominating-file buffer-file-name "tsconfig.json")
+                     (locate-dominating-file buffer-file-name "package.json")))
+        (setq-local lsp-workspace-root
+                    (or (locate-dominating-file buffer-file-name "tsconfig.json")
+                        (locate-dominating-file buffer-file-name "package.json")))))))
 
 (setq-hook! typescript-mode
   projectile-project-root-functions

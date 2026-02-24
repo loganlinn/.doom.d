@@ -1,5 +1,5 @@
 ;;; +org.el -*- lexical-binding: t; -*-
-(require 'org-protocol)
+(after! org (require 'org-protocol))
 
 
 (defun +org/ensure-trailing-slash (path)

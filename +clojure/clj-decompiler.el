@@ -43,9 +43,6 @@
   :group 'applications
   :link '(url-link :tag "GitHub" "https://github.com/bsless/clj-decompiler.el"))
 
-(require 'cider-mode)
-(require 'subr-x)
-
 (defconst clj-decompiler-decompile-buffer "*clj-decompile*")
 (defconst clj-decompiler-disassemble-buffer "*clj-disassemble*")
 

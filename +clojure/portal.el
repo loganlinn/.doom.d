@@ -1,8 +1,5 @@
 ;;; +clojure/portal.el -*- lexical-binding: t; -*-
 
-(require 'cider)
-(require 'easymenu)
-
 (after! cider
   (cider-add-to-alist 'cider-jack-in-dependencies "djblue/portal" "0.44.0")
 

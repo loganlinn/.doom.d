@@ -24,7 +24,10 @@
       :n "RET"      #'comint-send-input)
 
 (after! nix-mode
-  (add-hook! 'nix-mode-hook (nix-prettify-mode t)))
+  (add-hook! 'nix-mode-hook (nix-prettify-mode t))
+  (set-repl-handler! 'nix-mode #'+nix/switch-to-repl-buffer)
+  (set-formatter! 'alejandra '("alejandra" "-") :modes '(nix-mode))
+  (set-formatter! 'nixpkgs-fmt '("nixpkgs-fmt") :modes '(nix-mode)))
 
 (after! nix-repl
   (set-popup-rule! "^\\*Nix-REPL" :size 0.3 :quit nil :select t)
