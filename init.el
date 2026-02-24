@@ -198,6 +198,7 @@
        (web +lsp +tree-sitter)    ; the tubes
        (yaml +lsp +tree-sitter)   ; JSON, bue readable
        ;;(zig +lsp +tree-sitter)  ; C, but simpler
+       pkl                        ; Apple's configuration language
 
        :email
        ;; (mu4e
