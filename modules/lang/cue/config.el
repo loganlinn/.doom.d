@@ -3,6 +3,9 @@
 (use-package! cue-mode
   :defer t
   :config
-  (set-eglot-client! 'cue-mode '("cue" "lsp" "serve"))
+  (let ((prefix (when (and (not (executable-find "cue"))
+                          (executable-find "mise"))
+                  '("mise" "exec" "cue" "--"))))
+    (set-eglot-client! 'cue-mode (append prefix '("cue" "lsp" "serve"))))
   (when (modulep! +lsp)
     (add-hook 'cue-mode-local-vars-hook #'lsp! 'append)))
