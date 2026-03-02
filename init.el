@@ -199,6 +199,7 @@
        (yaml +lsp +tree-sitter)   ; JSON, bue readable
        ;;(zig +lsp +tree-sitter)  ; C, but simpler
        pkl                        ; Apple's configuration language
+       (cue +lsp)                 ; validate all the things
 
        :email
        ;; (mu4e
