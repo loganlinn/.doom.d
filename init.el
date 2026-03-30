@@ -33,7 +33,7 @@
         +defaults)
        (smooth-scroll +interpolate) ; So smooth you won't believe it's not butter
        tabs                         ; a tab bar for Emacs
-       (treemacs +lsp)              ; a project drawer, like neotree but cooler
+       treemacs                     ; a project drawer, like neotree but cooler
        unicode                      ; extended unicode support for various languages
        (vc-gutter +pretty)          ; vcs diff in the fringe
        vi-tilde-fringe              ; fringe tildes to mark beyond EOB
@@ -81,7 +81,7 @@
        (syntax          ; tasing you for every semicolon you forget
         +childframe
         +icons)
-       ;;(spell +flyspell) ; tasing you for misspelling mispelling
+       ;;(spell +flyspell) ; tasing you for misspelling misspelling
        ;;grammar        ; tasing grammar mistake every you make
 
        :tools
@@ -92,7 +92,7 @@
        direnv
        (docker +lsp)
        editorconfig     ; let someone else argue about tabs vs spaces
-       ;;ein            ; tame Jupyter notebooks with emacs
+       ;;in            ; tame Jupyter notebooks with emacs
        (eval +overlay)  ; run code, run (also, repls)
        lookup           ; navigate your code and its documentation
        llm              ; when I said you needed friends, I didn't mean...
