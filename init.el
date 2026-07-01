@@ -222,5 +222,6 @@
        (default +bindings +smartparens +gnupg)
        ;;literate
 
-       :lyl
-       (ai -copilot))
+       ;; :lyl
+       ;; (ai -copilot)
+       )
