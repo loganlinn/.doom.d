@@ -73,11 +73,64 @@ With active region, format as path:start-end. Otherwise path:line."
         (message "Copied: %s" ref))
     (user-error "Couldn't find filename in current buffer")))
 
+(defun +yank-code-snippet-as-markdown ()
+  "Copy region (or current line) as a markdown code fence with metadata.
+The metadata (path:lines, git rev) is embedded in an HTML comment so it
+remains invisible in rendered markdown but parseable by LLMs when
+pasted into a prompt."
+  (interactive)
+  (let* ((filename (or (buffer-file-name (buffer-base-buffer))
+                       (bound-and-true-p list-buffers-directory)))
+         (path (when filename
+                 (if-let ((root (doom-project-root)))
+                     (file-relative-name filename root)
+                   (abbreviate-file-name filename))))
+         (lang (replace-regexp-in-string
+                "\\(-ts\\)?-mode\\'" "" (symbol-name major-mode)))
+         (region (use-region-p))
+         (beg (if region (region-beginning) (line-beginning-position)))
+         (end (if region (region-end) (line-end-position)))
+         ;; If region ends at column 0, treat the prior line as the last.
+         (end* (if (and region (> end beg)
+                        (= end (save-excursion (goto-char end)
+                                               (line-beginning-position))))
+                   (1- end) end))
+         (start-line (line-number-at-pos beg))
+         (end-line (line-number-at-pos end*))
+         (loc (if (= start-line end-line)
+                  (number-to-string start-line)
+                (format "%d-%d" start-line end-line)))
+         (content (buffer-substring-no-properties beg end))
+         (default-directory (if filename
+                                (file-name-directory filename)
+                              default-directory))
+         (rev (when filename
+                (with-temp-buffer
+                  (when (zerop (call-process "git" nil t nil
+                                             "rev-parse" "--short" "HEAD"))
+                    (string-trim (buffer-string))))))
+         (dirty (and filename rev
+                     (or (buffer-modified-p)
+                         (not (zerop (call-process
+                                      "git" nil nil nil
+                                      "diff" "--quiet" "HEAD" "--" filename))))))
+         (meta (string-join
+                (delq nil
+                      (list (when path (format "file=%s:%s" path loc))
+                            (when rev (format "rev=%s%s" rev (if dirty "-dirty" "")))))
+                " "))
+         (result (format "<!-- %s -->\n```%s\n%s\n```\n"
+                         meta lang
+                         (string-trim-right content "\n"))))
+    (kill-new result)
+    (message "Copied: %s" meta)))
+
 (map! :leader
       (:prefix-map ("b" . "buffer")
        :desc "Kill buffer everywhere"     "k" #'doom/kill-this-buffer-in-all-windows
        :desc "Kill matching buffers"      "/" #'doom/kill-matching-buffers
-       :desc "Yank buffer path:line"      "Y" #'+yank-buffer-path-with-line)
+       :desc "Yank buffer path:line"      "Y" #'+yank-buffer-path-with-line
+       :desc "Yank as markdown snippet"   "M" #'+yank-code-snippet-as-markdown)
 
       (:prefix-map ("p" . "project")
        :desc "Kill other project buffers" "K" #'doom/kill-project-buffers)
