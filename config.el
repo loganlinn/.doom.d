@@ -4,7 +4,7 @@
       user-mail-address "logan@loganlinn.com"
       fill-column 99
       display-line-numbers-type 'relative
-      fancy-splash-image (concat doom-private-dir "splash.png"))
+      fancy-splash-image (concat doom-user-dir "splash.png"))
 
 ;; macos: ⌘ instead of ⌥ for meta
 (setq mac-option-key-is-meta nil
@@ -13,7 +13,7 @@
       mac-option-modifier 'none)
 
 (setq delete-by-moving-to-trash t
-      trash-directory (cond (IS-MAC "") ))
+      trash-directory (cond ((featurep :system 'macos) "")))
 
 (setq doom-theme 'doom-one
       doom-one-padded-modeline nil
@@ -31,7 +31,7 @@
   (add-to-list '+doom-dashboard-menu-sections
                '("Open daily note"
                  :icon (nerd-icons-faicon "nf-fa-calendar" :face 'doom-dashboard-menu-title)
-                 :when (featurep! :lang org +journal)
+                 :when (modulep! :lang org +journal)
                  :face (:inherit (doom-dashboard-menu-title bold))
                  :action org-roam-dailies-goto-today)))
 
