@@ -75,6 +75,7 @@
        ;;shell          ; simple shell REPL for Emacs
        ;;term           ; basic terminal emulator for Emacs
        vterm            ; the best terminal emulation in Emacs
+       ghostel           ; terminal emulator powered by libghostty-vt
        kitty
 
        :checkers
