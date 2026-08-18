@@ -511,6 +511,7 @@ pasted into a prompt."
 (when (modulep! :lang javascript) (load! "+javascript"))
 (when (modulep! :lang lsp) (load! "+lsp"))
 (when (modulep! :lang lua) (load! "+lua"))
+(when (modulep! :lang markdown) (load! "+markdown"))
 (when (modulep! :lang nix) (load! "+nix"))
 (when (modulep! :lang org) (load! "+org"))
 (when (featurep :system 'macos) (load! "+darwin"  nil t))
