@@ -4,6 +4,9 @@
 ;; (package! docker-compose-mode)
 ;; (package! doom-themes :recipe (:host github :repo "loganlinn/doom-themes"))
 (package! evil-cleverparens :recipe (:host github :repo "emacs-evil/evil-cleverparens") :pin "134fe3396f975fb1ad261f52cd113f42ac1da4fc")
+(package! emacs-everywhere
+  :recipe (:host github :repo "dmgerman/emacs-everywhere")
+  :pin "62a9ba114f6ad43d5c77baedad442ae87606a2da")
 (package! fnm :recipe (:host github :repo "bobrowadam/fnm.el"))
 ;; (package! git-spice :recipe (:host github :repo "/jesse-c/git-spice.el" :files ("*.el")))
 ;; (package! kagi)

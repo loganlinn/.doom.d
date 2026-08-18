@@ -35,6 +35,30 @@
                  :face (:inherit (doom-dashboard-menu-title bold))
                  :action org-roam-dailies-goto-today)))
 
+(when (modulep! :app everywhere)
+  (load "~/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el")
+
+  (use-package! emacs-everywhere
+    :config
+    (put 'emacs-everywhere-mode 'permanent-local t)
+    (add-to-list 'emacs-everywhere-system-configs
+                 '(hammerspoon
+                   :info-function hammerspoon-emacs-everywhere-app-info
+                   :focus-command
+                   ("hs" "-q" "-c" "spoon.editWithEmacs:endEditing(%w, false)"))
+                 t)
+    (advice-add 'emacs-everywhere--system-compositor
+                :filter-return #'hammerspoon-emacs-everywhere-compositor)
+    (setq emacs-everywhere--system-configured nil)
+    ;; Hammerspoon puts the selection on the clipboard before invoking
+    ;; emacsclient. Avoid emacs-everywhere's osascript selection grab.
+    (setq emacs-everywhere-init-hooks
+          (mapcar (lambda (fn)
+                    (if (eq fn 'emacs-everywhere-insert-selection) 'yank fn))
+                  emacs-everywhere-init-hooks))
+    (define-key emacs-everywhere-mode-map (kbd "C-c C-c")
+                #'hammerspoon-emacs-everywhere-finish)))
+
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode t)
   (setq-hook! 'pixel-scroll-mode
