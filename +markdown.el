@@ -11,9 +11,3 @@
               "<meta name='color-scheme' content='dark'>"
               ;; pandoc runs with --mathjax; render math spans if present
               "<script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>"))
-
-;; +grip claims the localleader "p" binding; keep pandoc preview reachable.
-(map! :after markdown-mode
-      :map markdown-mode-map
-      :localleader
-      :desc "Preview in browser" "P" #'markdown-preview)
