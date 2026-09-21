@@ -91,7 +91,7 @@
        ;;collab         ; buffers with friends
        ;;codex-ide      ; native Codex sessions in Emacs
        ;;debugger       ; FIXME stepping through code, to help you add bugs
-       direnv
+       ;;direnv         ; mise manages buffer-local environments
        (docker +lsp)
        editorconfig     ; let someone else argue about tabs vs spaces
        ;;in            ; tame Jupyter notebooks with emacs

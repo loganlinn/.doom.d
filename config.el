@@ -528,6 +528,7 @@ pasted into a prompt."
       :prefix "g"
       :desc "Clone repository" "C" #'src-get)
 
+(load! "+mise")
 (when (modulep! :completion vertico) (load! "+vertico"))
 (when (modulep! :lang clojure) (load! "+clojure"))
 (when (modulep! :lang crystal) (load! "+crystal"))
